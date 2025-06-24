@@ -52,17 +52,17 @@ struct ShoppingItemView: View {
                         }
                     )
                 }
-                VStack(alignment: .trailing) {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        ShoppingItemImagePicker { image in
-                            
-                        } onClick: {
-                            isFocused = false
-                        }
-                    }
-                }
+//                VStack(alignment: .trailing) {
+//                    Spacer()
+//                    HStack {
+//                        Spacer()
+//                        ShoppingItemImagePicker { image in
+//                            
+//                        } onClick: {
+//                            isFocused = false
+//                        }
+//                    }
+//                }
             }
         }
         .navigationTitle(title.isEmpty ? "New Item" : title)
@@ -71,9 +71,16 @@ struct ShoppingItemView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     if let category = self.category {
-                        let id = self.id ?? UUID().uuidString
-                        let item = ShoppingItem.newInstance(id, title, subtitle, category, context: context)
-                        onComplete(item)
+                        if let item = self.editingItem {
+                            item.title = title
+                            item.describe = subtitle
+                            item.category = category
+                            onComplete(item)
+                        }
+                        else {
+                            let item = ShoppingItem.newInstance(UUID().uuidString, title, subtitle, category, context: context)
+                            onComplete(item)
+                        }
                         dismiss()
                     }
                 }
@@ -82,7 +89,14 @@ struct ShoppingItemView: View {
         }
         .toolbarBackground(.visible, for: .navigationBar)
         .task {
-            self.isFocused = true
+            if let item = editingItem {
+                title = item.title ?? ""
+                subtitle = item.describe ?? ""
+                category = item.category
+            }
+            else {
+                self.isFocused = true
+            }
         }
     }
 

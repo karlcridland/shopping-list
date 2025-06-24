@@ -13,11 +13,11 @@ struct ShoppingListView: View {
     
     @ObservedObject var shoppingList: ShoppingList
     
-    @State var showItems: Bool = true
-    @State var showHistory: Bool = false
-    @State var showSettings: Bool = false
-    
-    @State var showNewItem: Bool = false
+    @State private var showItems: Bool = true
+    @State private var showHistory: Bool = false
+    @State private var showSettings: Bool = false
+    @State private var showNewItem: Bool = false
+    @State private var isSharing: Bool = false
     
     @FocusState private var focusTitleEdit: Bool
     
@@ -30,8 +30,10 @@ struct ShoppingListView: View {
                     ShoppingListHeader(title: $shoppingList.title, addItem: {
                         editingItem = nil
                         showNewItem = true
+                        resetDisplay()
+                        self.showItems = true
                     }, shareList: {
-                        print("sharing list")
+                        isSharing = true
                     })
                     HStack(spacing: 10) {
                         ShoppingListMenuButton(title: "Items", displaying: $showItems, onClick: resetDisplay)
@@ -65,27 +67,18 @@ struct ShoppingListView: View {
             }
             .toolbar(removing: nil)
             .navigationDestination(isPresented: $showNewItem) {
-                if let item = editingItem {
-                        ShoppingItemView(editingItem: item) { updated in
-                            do {
-                                try context.save()
-                                editingItem = nil
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        }
-                        .environment(\.managedObjectContext, context)
-                    } else {
-                        ShoppingItemView() { newItem in
-                            do {
-                                newItem.list = shoppingList
-                                try context.save()
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        }
-                        .environment(\.managedObjectContext, context)
+                ShoppingItemView(editingItem: editingItem) { item in
+                    do {
+                        shoppingList.update(item, context: context)
+                        try context.save()
                     }
+                    catch {
+                        print(error.localizedDescription)
+                    }
+                }
+            }
+            .sheet(isPresented: $isSharing) {
+                ShareSheet(activityItems: [shoppingList.shareText])
             }
         }
     }

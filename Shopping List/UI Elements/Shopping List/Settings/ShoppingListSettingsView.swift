@@ -24,14 +24,14 @@ struct ShoppingListSettingsView: View {
                         self.save(title: value)
                     }
             }
-            Section("Shoppers") {
-                let shoppers: [Shopper] = shoppingList.shoppers?.allObjects as? [Shopper] ?? []
-                List {
-                    ForEach(shoppers) { shopper in
-                        Text(shopper.name ?? "")
-                    }
-                }
-            }
+//            Section("Shoppers") {
+//                let shoppers: [Shopper] = shoppingList.shoppers?.allObjects as? [Shopper] ?? []
+//                List {
+//                    ForEach(shoppers) { shopper in
+//                        Text(shopper.name ?? "")
+//                    }
+//                }
+//            }
         }
     }
 

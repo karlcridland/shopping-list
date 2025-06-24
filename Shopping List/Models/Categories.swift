@@ -30,6 +30,7 @@ enum Category: String, CaseIterable, Identifiable, Comparable {
     case baby = "Baby"
     case pharmacy = "Pharmacy"
     case miscellaneous = "Miscellaneous"
+    case toysAndGames = "Toys and Games"
     
     static func <(lhs: Category, rhs: Category) -> Bool {
         return lhs.rawValue < rhs.rawValue

@@ -6,6 +6,8 @@
         <relationship name="lists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ShoppingList" inverseName="shoppers" inverseEntity="ShoppingList"/>
     </entity>
     <entity name="ShoppingItem" representedClassName="ShoppingItem" syncable="YES" codeGenerationType="class">
+        <attribute name="addedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="basketDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="categoryRaw" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
         <attribute name="describe" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>

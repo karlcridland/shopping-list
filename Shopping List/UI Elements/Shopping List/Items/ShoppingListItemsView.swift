@@ -12,11 +12,27 @@ struct ShoppingListItemsView: View {
     
     @ObservedObject var shoppingList: ShoppingList
     
+    @State private var showPreview = false
+    @State private var previewItem: ShoppingItem?
+    
     var onEdit: (ShoppingItem) -> Void
+    
+    @FetchRequest var items: FetchedResults<ShoppingItem>
+
+    init(shoppingList: ShoppingList, onEdit: @escaping (ShoppingItem) -> Void) {
+        self.shoppingList = shoppingList
+        self.onEdit = onEdit
+        
+        _items = FetchRequest<ShoppingItem>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)],
+            predicate: NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "list == %@", shoppingList),
+                NSPredicate(format: "basketDate == nil")
+            ])
+        )
+    }
 
     var body: some View {
-        let items: [ShoppingItem] = (shoppingList.items?.allObjects as? [ShoppingItem]) ?? []
-
         if items.isEmpty {
             NoItemsDefault()
         } else {
@@ -26,30 +42,34 @@ struct ShoppingListItemsView: View {
                 ForEach(categories, id: \.self) { category in
                     let filtered = items.filter { $0.category == category }
                     Section(category.rawValue) {
-                        ForEach(filtered, id: \.category) { item in
-                            ShoppingItemThumbnail(item: item, onClick: { item in
-                                onEdit(item)
+                        ForEach(filtered) { item in
+                            ShoppingItemThumbnail(item: item, onClick: {
+                                preview(item)
                             })
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) {
-                                    deleteItem(item)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                        .fontWeight(.semibold)
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                SwipeButton(systemImage: "pencil", label: "Edit", tint: Color(.systemBlue)) {
+                                    onEdit(item)
                                 }
                             }
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                Button {
-                                } label: {
-                                    Label("Edit", systemImage: "checkmark.circle")
-                                        .fontWeight(.semibold)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                SwipeButton(systemImage: "checkmark.circle", label: "Mark Complete", tint: Color(.accent)) {
+                                    markComplete(item)
                                 }
-                                .tint(Color(.accent))
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                SwipeButton(isDestructive: true, systemImage: "trash", label: "Delete") {
+                                    deleteItem(item)
+                                }
                             }
                         }
                     }
                 }
             }
+//            .sheet(isPresented: $showPreview) {
+//                if let item = previewItem {
+//                    ShoppingItemPreview(item: item)
+//                }
+//            }
         }
     }
     
@@ -59,6 +79,22 @@ struct ShoppingListItemsView: View {
             try context.save()
         } catch {
             fatalError("Unresolved error \(error as NSError)")
+        }
+    }
+    
+    private func preview(_ item: ShoppingItem) {
+        previewItem = item
+        showPreview = true
+    }
+    
+    private func markComplete(_ item: ShoppingItem) {
+        print("marking complete")
+        item.basketDate = Date()
+        do {
+            try context.save()
+        }
+        catch {
+            print(error.localizedDescription)
         }
     }
     
@@ -76,6 +112,27 @@ struct ShoppingListItemsView: View {
     }
     
     private func editItem(_ item: ShoppingItem) {
-        print(item.title ?? "")
+        onEdit(item)
     }
+    
+    private struct SwipeButton: View {
+        
+        var isDestructive: Bool = false
+        var systemImage: String
+        var label: String
+        var tint: Color?
+        
+        var onClick: () -> Void
+        
+        var body: some View {
+            Button(role: isDestructive ? .destructive : .none) {
+                onClick()
+            } label: {
+                Label(label, systemImage: systemImage)
+                    .fontWeight(.semibold)
+            }
+            .tint(isDestructive ? nil : tint)
+        }
+    }
+    
 }

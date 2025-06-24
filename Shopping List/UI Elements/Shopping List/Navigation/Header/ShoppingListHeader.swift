@@ -16,7 +16,7 @@ struct ShoppingListHeader: View {
 
     var body: some View {
         HStack {
-            ShoppingListAddItem(onClick: addItem)
+            ShoppingListShare(onClick: shareList)
 
             Spacer()
 
@@ -30,7 +30,7 @@ struct ShoppingListHeader: View {
 
             Spacer()
             
-            ShoppingListShare(onClick: shareList)
+            ShoppingListAddItem(onClick: addItem)
         }
     }
 }

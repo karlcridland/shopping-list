@@ -11,6 +11,19 @@ import CoreData
 struct ShoppingListThumbnail: View {
     
     @ObservedObject var shoppingList: ShoppingList
+    @FetchRequest var items: FetchedResults<ShoppingItem>
+
+    init(shoppingList: ShoppingList) {
+        self.shoppingList = shoppingList
+        
+        _items = FetchRequest<ShoppingItem>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)],
+            predicate: NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "list == %@", shoppingList),
+                NSPredicate(format: "basketDate == nil")
+            ])
+        )
+    }
     
     var onTapped: ((ShoppingList?) -> Void)?
     
@@ -42,13 +55,12 @@ struct ShoppingListThumbnail: View {
     }
     
     var subtitle: String {
-        if let items = shoppingList.items?.allObjects as? [ShoppingItem],
-           let shoppers = shoppingList.shoppers?.allObjects as? [Shopper] {
+        if let shoppers = shoppingList.shoppers?.allObjects as? [Shopper] {
             var results: [String] = []
             if (items.count > 0) {
-                results.append("\(items.count) items")
+                results.append("\(items.count) item\(items.count == 1 ? "" : "s")")
             }
-            if (shoppers.count > 0) {
+            if (shoppers.count > 1) {
                 results.append("\(shoppers.count) people")
             }
             if (results.count > 0) {

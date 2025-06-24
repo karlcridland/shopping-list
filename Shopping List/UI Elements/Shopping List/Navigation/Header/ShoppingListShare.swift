@@ -27,7 +27,7 @@ struct ShoppingListShare: View, ShoppingListButtonStyle {
         .background(background)
         .cornerRadius(cornerRadius)
         .shadow(color: .black.opacity(0.1), radius: 4)
-        .padding(.leading, 24)
+        .padding(.trailing, 24)
     }
     
 }
