@@ -53,11 +53,12 @@ struct HomeView: View {
             let newShoppingList = ShoppingList(context: context)
             newShoppingList.created = Date()
             newShoppingList.lastUpdated = Date()
+            newShoppingList.id = UUID().uuidString
             do {
                 try context.save()
                 path.append(newShoppingList)
-            } catch {
-                print("Failed to save new list:", error)
+            } catch let error as NSError {
+                print("Core Data save failed: \(error), \(error.userInfo)")
             }
         }
     }

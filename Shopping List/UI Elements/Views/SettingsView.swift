@@ -9,10 +9,25 @@ import SwiftUI
 import CoreData
 
 struct SettingsView: View {
-
+    
+    var signOut: () -> Void
+    var deleteAccount: () -> Void
+    
     var body: some View {
         NavigationView {
             List {
+                Section("Leaving us?") {
+                    Button {
+                        signOut()
+                    } label: {
+                        Text("Sign Out")
+                    }
+                    Button {
+                        deleteAccount()
+                    } label: {
+                        Text("Delete Account")
+                    }
+                }
             }
             .navigationTitle("Settings")
         }
@@ -21,5 +36,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    SettingsView(signOut: {}, deleteAccount: {}).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

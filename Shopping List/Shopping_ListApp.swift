@@ -6,20 +6,40 @@
 //
 
 import SwiftUI
+import FirebaseCore
+import FirebaseAuth
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+    return true
+  }
+}
 
 @main
 struct Shopping_ListApp: App {
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var authViewModel = AuthViewModel()
+    
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            if Auth.auth().currentUser != nil {
+                MainView(viewModel: authViewModel)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            } else {
+                AuthView(viewModel: authViewModel)
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            }
         }
     }
 }
 
 struct MainView: View {
+    
+    var viewModel: AuthViewModel
     
     var body: some View {
         TabView {
@@ -35,7 +55,7 @@ struct MainView: View {
                 .tabItem {
                     Label("Stats", systemImage: "chart.pie")
                 }
-            SettingsView()
+            SettingsView(signOut: viewModel.signOut, deleteAccount: viewModel.deleteAccount)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }

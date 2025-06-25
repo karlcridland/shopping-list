@@ -21,5 +21,5 @@ struct StatisticsView: View {
 }
 
 #Preview {
-    SettingsView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    StatisticsView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
