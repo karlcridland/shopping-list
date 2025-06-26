@@ -47,39 +47,73 @@ struct Shopping_ListApp: App {
 struct MainView: View {
     
     @Environment(\.managedObjectContext) private var context
-    
     @ObservedObject private var notificationModel = NotificationButtonModel.shared
     var viewModel: AuthViewModel
-    
+
     var body: some View {
-        NavigationStack {
-            TabView {
+        TabView {
+            
+            NavigationStack {
                 HomeView(context: context)
-                    .tabItem {
-                        Label("Home", systemImage: "house")
+                    .navigationTitle("Shopping Lists")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            NotificationButton(model: notificationModel)
+                        }
                     }
+                    .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
+                        NotificationView()
+                    }
+            }
+            .tabItem {
+                Label("Home", systemImage: "house")
+            }
+            
+            NavigationStack {
                 FriendsView()
-                    .tabItem {
-                        Label("Friends", systemImage: "person.2.fill")
+                    .navigationTitle("Friends")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            NotificationButton(model: notificationModel)
+                        }
                     }
+                    .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
+                        NotificationView()
+                    }
+            }
+            .tabItem {
+                Label("Friends", systemImage: "person.2.fill")
+            }
+
+            NavigationStack {
                 StatisticsView()
-                    .tabItem {
-                        Label("Stats", systemImage: "chart.pie")
+                    .navigationTitle("Statistics")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            NotificationButton(model: notificationModel)
+                        }
                     }
+                    .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
+                        NotificationView()
+                    }
+            }
+            .tabItem {
+                Label("Stats", systemImage: "chart.pie")
+            }
+
+            NavigationStack {
                 SettingsView(signOut: viewModel.signOut, deleteAccount: viewModel.deleteAccount)
-                    .tabItem {
-                        Label("Settings", systemImage: "gear")
+                    .navigationTitle("Settings")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
+                        NotificationView()
                     }
             }
-            .navigationTitle("Friends")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NotificationButton(model: NotificationButtonModel.shared)
-                }
-            }
-            .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
-                NotificationView()
+            .tabItem {
+                Label("Settings", systemImage: "gear")
             }
         }
     }

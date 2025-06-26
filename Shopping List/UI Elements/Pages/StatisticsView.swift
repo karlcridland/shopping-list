@@ -15,11 +15,6 @@ struct StatisticsView: View {
         }
         .navigationTitle("Statistics")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NotificationButton(model: NotificationButtonModel.shared)
-            }
-        }
     }
     
 }

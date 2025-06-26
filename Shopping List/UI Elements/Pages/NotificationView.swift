@@ -13,9 +13,6 @@ struct NotificationView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(0 ..< 10) { i in
-                    Text(String(i))
-                }
             }
         }
         .navigationTitle("Notifications")
