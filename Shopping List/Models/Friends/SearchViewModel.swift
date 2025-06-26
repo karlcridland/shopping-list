@@ -17,6 +17,8 @@ class SearchViewModel: ObservableObject {
     @Published private(set) var results: [Shopper] = []
     @Published var isLoading: Bool = false
     @Published var searchedString: String = ""
+    
+    @Published var showDuplicateRequestAlert: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
     private var searchTask: Task<Void, Never>?
@@ -30,7 +32,7 @@ class SearchViewModel: ObservableObject {
 
                 self.searchTask?.cancel()
                 self.searchTask = Task {
-                    let fetchedResults = await Database.users.search(query: value, context: context)
+                    let fetchedResults = await Database.users.shoppers.search(query: value, context: context)
                     self.isLoading = true
                     await MainActor.run {
                         self.results = fetchedResults

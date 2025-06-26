@@ -12,17 +12,13 @@ struct FriendsView: View {
     @Environment(\.managedObjectContext) private var context
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Shopper.name, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Shopper.familyName, ascending: true)],
         animation: .default)
     private var shoppers: FetchedResults<Shopper>
 
     var body: some View {
-        NavigationView {
-            SearchView(context: context)
-                .navigationTitle("Friends")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar(removing: nil)
-        }
+        SearchView(context: context)
+        .background(Color(.systemGroupedBackground))
     }
     
     private func removeFriend(offsets: IndexSet) {

@@ -20,6 +20,7 @@ struct ShoppingListSettingsView: View {
             Section("Title") {
                 TextField("e.g. The Weekly Shop", text: title)
                     .focused($focusTitleEdit)
+                    .submitLabel(.done)
                     .onChange(of: title.wrappedValue) { (_, value) in
                         self.save(title: value)
                     }

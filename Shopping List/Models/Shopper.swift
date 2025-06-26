@@ -8,7 +8,11 @@
 extension Shopper {
     
     public override var description: String {
-        return "\(self.name!) (\(self.uid!))"
+        return "\(self.name.full) (\(self.uid!))"
+    }
+    
+    var name: Name {
+        return Name(givenName ?? "", familyName ?? "")
     }
     
 }
@@ -17,4 +21,5 @@ enum FriendStatus: String {
     case pending = "Pending"
     case accepted = "Accepted"
     case rejected = "Rejected"
+    case requestReceived = "Request Received"
 }

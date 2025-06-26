@@ -11,11 +11,14 @@ import CoreData
 struct StatisticsView: View {
 
     var body: some View {
-        NavigationView {
-            List {
+        List {
+        }
+        .navigationTitle("Statistics")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NotificationButton(model: NotificationButtonModel.shared)
             }
-            .navigationTitle("Statistics")
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
     

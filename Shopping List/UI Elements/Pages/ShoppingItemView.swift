@@ -18,7 +18,8 @@ struct ShoppingItemView: View {
     @State var subtitle: String = ""
     @State var category: Category?
     
-    @FocusState private var isFocused: Bool
+    @FocusState private var titleFocused: Bool
+    @FocusState private var describeFocused: Bool
     
     var editingItem: ShoppingItem?
     
@@ -31,14 +32,21 @@ struct ShoppingItemView: View {
                     List {
                         Section("Title") {
                             TextField("e.g. Tomatoes", text: $title)
-                                .focused($isFocused)
-                                .submitLabel(.done)
-                                .onSubmit { isFocused = false }
+                                .focused($titleFocused)
+                                .submitLabel(.next)
+                                .onSubmit {
+                                    titleFocused = false
+                                    describeFocused = true
+                                }
                         }
                         
                         Section("Description (optional)") {
                             TextField("e.g. Riper the better!", text: $subtitle)
+                                .focused($describeFocused)
                                 .submitLabel(.done)
+                                .onSubmit {
+                                    describeFocused = false
+                                }
                         }
                         
                         ShoppingItemCategoryPicker(category: $category)
@@ -46,9 +54,8 @@ struct ShoppingItemView: View {
                     }
                     .simultaneousGesture(
                         DragGesture().onChanged { _ in
-                            if (isFocused) {
-                                isFocused = false
-                            }
+                            titleFocused = false
+                            describeFocused = false
                         }
                     )
                 }
@@ -95,7 +102,7 @@ struct ShoppingItemView: View {
                 category = item.category
             }
             else {
-                self.isFocused = true
+                self.titleFocused = true
             }
         }
     }

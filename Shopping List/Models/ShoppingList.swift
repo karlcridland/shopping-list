@@ -86,4 +86,8 @@ extension ShoppingList {
         return results.joined(separator: "\n")
     }
     
+    public static func == (lhs: ShoppingList, rhs: ShoppingList) -> Bool {
+        lhs.id == rhs.id
+    }
+    
 }

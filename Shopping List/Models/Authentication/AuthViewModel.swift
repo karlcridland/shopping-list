@@ -67,7 +67,7 @@ class AuthViewModel: NSObject, ObservableObject, ASAuthorizationControllerDelega
                     if let givenName = appleIDCredential.fullName?.familyName,
                         let familyName = appleIDCredential.fullName?.familyName {
                         let name = Name(givenName, familyName)
-                        Database.users.set(name: name)
+                        Database.users.shoppers.set(name: name)
                         let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
                         changeRequest?.displayName = name.full
                         changeRequest?.commitChanges()

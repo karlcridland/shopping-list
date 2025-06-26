@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Shopper" representedClassName="Shopper" syncable="YES" codeGenerationType="class">
-        <attribute name="name" attributeType="String"/>
+        <attribute name="familyName" attributeType="String"/>
+        <attribute name="givenName" attributeType="String"/>
         <attribute name="uid" attributeType="String"/>
         <relationship name="lists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ShoppingList" inverseName="shoppers" inverseEntity="ShoppingList"/>
     </entity>

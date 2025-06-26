@@ -12,9 +12,12 @@ struct ShoppingListThumbnail: View {
     
     @ObservedObject var shoppingList: ShoppingList
     @FetchRequest var items: FetchedResults<ShoppingItem>
+    
+    var onTapped: () -> Void
 
-    init(shoppingList: ShoppingList) {
+    init(shoppingList: ShoppingList, onTapped: @escaping () -> Void) {
         self.shoppingList = shoppingList
+        self.onTapped = onTapped
         
         _items = FetchRequest<ShoppingItem>(
             sortDescriptors: [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)],
@@ -25,11 +28,9 @@ struct ShoppingListThumbnail: View {
         )
     }
     
-    var onTapped: ((ShoppingList?) -> Void)?
-    
     var body: some View {
         Button {
-            onTapped?(shoppingList)
+            onTapped()
         } label: {
             HStack {
                 VStack (alignment: .leading, spacing: 5, content: {
@@ -73,10 +74,6 @@ struct ShoppingListThumbnail: View {
     
 }
 
-#Preview {
-    HomeView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-}
-
 struct NewShoppingListThumbnail: View {
     
     var onCreate: (() -> Void)?
@@ -112,8 +109,3 @@ struct NewShoppingListThumbnail: View {
     }
     
 }
-
-#Preview {
-    HomeView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-}
-
