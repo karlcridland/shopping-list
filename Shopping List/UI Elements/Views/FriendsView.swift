@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct FriendsView: View {
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.managedObjectContext) private var context
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Shopper.name, ascending: true)],
@@ -18,23 +18,19 @@ struct FriendsView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(shoppers) { shopper in
-                    
-                }
-                .onDelete(perform: removeFriend)
-            }
-            .navigationTitle("Friends")
-            .toolbar(removing: nil)
+            SearchView(context: context)
+                .navigationTitle("Friends")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(removing: nil)
         }
     }
     
     private func removeFriend(offsets: IndexSet) {
         withAnimation {
-            offsets.map { shoppers[$0] }.forEach(viewContext.delete)
+            offsets.map { shoppers[$0] }.forEach(context.delete)
 
             do {
-                try viewContext.save()
+                try context.save()
             } catch {
                 fatalError("Unresolved error \(error as NSError)")
             }

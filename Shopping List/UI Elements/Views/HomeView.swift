@@ -39,6 +39,7 @@ struct HomeView: View {
             .listRowSpacing(10)
             .contentMargins(.top, 12)
             .navigationTitle("Shopping Lists")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar(removing: nil)
             .navigationDestination(for: ShoppingList.self) { shoppingList in
                 ShoppingListView(shoppingList: shoppingList)

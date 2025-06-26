@@ -115,24 +115,24 @@ struct ShoppingListItemsView: View {
         onEdit(item)
     }
     
-    private struct SwipeButton: View {
-        
-        var isDestructive: Bool = false
-        var systemImage: String
-        var label: String
-        var tint: Color?
-        
-        var onClick: () -> Void
-        
-        var body: some View {
-            Button(role: isDestructive ? .destructive : .none) {
-                onClick()
-            } label: {
-                Label(label, systemImage: systemImage)
-                    .fontWeight(.semibold)
-            }
-            .tint(isDestructive ? nil : tint)
-        }
-    }
+}
+
+struct SwipeButton: View {
     
+    var isDestructive: Bool = false
+    var systemImage: String
+    var label: String
+    var tint: Color?
+    
+    var onClick: () -> Void
+    
+    var body: some View {
+        Button(role: isDestructive ? .destructive : .none) {
+            onClick()
+        } label: {
+            Label(label, systemImage: systemImage)
+                .fontWeight(.semibold)
+        }
+        .tint(isDestructive ? nil : tint)
+    }
 }

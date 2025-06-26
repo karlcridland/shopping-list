@@ -47,7 +47,7 @@ struct ShoppingListHistoryView: View {
                 }
             }
             .navigationDestination(isPresented: $showingResults) {
-                ShoppingHistoryResultsView(items: self.results)
+                ShoppingHistoryResultsView(items: $results)
             }
         }
     }

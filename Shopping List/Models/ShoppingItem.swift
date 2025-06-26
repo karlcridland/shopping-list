@@ -15,6 +15,7 @@ extension ShoppingItem {
         item.title = title
         item.describe = describe
         item.category = category
+        item.addedDate = Date()
         return item
     }
     

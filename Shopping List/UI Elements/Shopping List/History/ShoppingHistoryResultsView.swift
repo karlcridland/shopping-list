@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ShoppingHistoryResultsView: View {
+    @Environment(\.managedObjectContext) private var context
+    @Environment(\.dismiss) var dismiss
     
-    @State var items: [ShoppingItem]
+    @Binding var items: [ShoppingItem]
     
     var body: some View {
         List {
@@ -23,11 +25,16 @@ struct ShoppingHistoryResultsView: View {
 //                            preview(item)
                         })
                         .disabled(true)
-//                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-//                            SwipeButton(systemImage: "arrow.uturn.left.circle", label: "Undo", tint: Color(.accent)) {
-//                                markComplete(item)
-//                            }
-//                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            SwipeButton(systemImage: "arrow.uturn.left.circle", label: "Undo", tint: Color(.accent)) {
+                                item.basketDate = nil
+                                try? context.save()
+                                items.removeAll { $0.id == item.id }
+                                if (items.count == 0) {
+                                    dismiss()
+                                }
+                            }
+                        }
 //                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
 //                            SwipeButton(isDestructive: true, systemImage: "trash", label: "Delete") {
 //                                deleteItem(item)

@@ -74,13 +74,13 @@ extension ShoppingList {
     
     var shareText: String {
         var results: [String] = []
-        self.outstanding.forEach { item in
+        self.outstanding.sorted(by: {$0.category < $1.category}).forEach { item in
             if let title = item.title {
                 var text: [String] = [title]
-                if let describe = item.describe {
+                if let describe = item.describe, !describe.isEmpty {
                     text.append("\(describe)")
                 }
-                results.append(text.joined(separator: " "))
+                results.append("• \(text.joined(separator: " - "))")
             }
         }
         return results.joined(separator: "\n")

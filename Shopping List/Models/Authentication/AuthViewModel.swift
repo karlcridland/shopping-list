@@ -63,6 +63,19 @@ class AuthViewModel: NSObject, ObservableObject, ASAuthorizationControllerDelega
                 if let error = error {
                     print("Sign in failed: \(error.localizedDescription)")
                 }
+                if (result?.user.displayName == nil) {
+                    if let givenName = appleIDCredential.fullName?.familyName,
+                        let familyName = appleIDCredential.fullName?.familyName {
+                        let name = Name(givenName, familyName)
+                        Database.users.set(name: name)
+                        let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+                        changeRequest?.displayName = name.full
+                        changeRequest?.commitChanges()
+                    }
+                    else {
+                        print("no name loser")
+                    }
+                }
             }
 
         case .failure(let error):
@@ -77,15 +90,6 @@ class AuthViewModel: NSObject, ObservableObject, ASAuthorizationControllerDelega
             .compactMap { $0 as? UIWindowScene }
             .flatMap { $0.windows }
             .first { $0.isKeyWindow } ?? UIWindow()
-    }
-    
-    // These delegate methods are still useful if needed elsewhere
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        // Not used directly anymore — logic moved to `handle()`
-    }
-    
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        print("Authorization error: \(error.localizedDescription)")
     }
 
     // MARK: - Helpers

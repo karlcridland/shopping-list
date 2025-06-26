@@ -15,6 +15,7 @@ struct StatisticsView: View {
             List {
             }
             .navigationTitle("Statistics")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
