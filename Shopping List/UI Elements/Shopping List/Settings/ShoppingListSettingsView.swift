@@ -46,6 +46,7 @@ struct ShoppingListSettingsView: View {
     private func save(title: String) {
         do {
             shoppingList.title = title.count > 0 ? title : nil
+            shoppingList.save()
             try context.save()
         } catch {
             print("Error saving:", error.localizedDescription)

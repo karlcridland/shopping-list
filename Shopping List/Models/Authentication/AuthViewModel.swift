@@ -30,7 +30,13 @@ class AuthViewModel: NSObject, ObservableObject, ASAuthorizationControllerDelega
     }
     
     func signOut() {
-        try? Auth.auth().signOut()
+        do {
+            try Auth.auth().signOut()
+            ShoppingListObserver.shared.stopObserving()
+        }
+        catch {
+            
+        }
     }
     
     func deleteAccount() {

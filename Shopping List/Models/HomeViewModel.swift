@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import FirebaseAuth
 
 @MainActor
 class HomeViewModel: ObservableObject {
@@ -38,18 +39,27 @@ class HomeViewModel: ObservableObject {
         list.id = UUID().uuidString
         list.created = Date()
         list.lastUpdated = Date()
+        list.owner = Auth.auth().currentUser?.uid
+        list.shopperData = [] as NSSet
+        list.save()
 
         saveContext()
-        fetchLists() // refresh
+        fetchLists()
         selectedList = list
+        showShoppingList = true
     }
 
     func deleteLists(at offsets: IndexSet) {
         for index in offsets {
-            context.delete(shoppingLists[index])
+            let shoppingList = shoppingLists[index]
+            Task {
+                await shoppingList.delete()
+                context.delete(shoppingList)
+            }
         }
         saveContext()
         fetchLists()
+        selectedList?.save()
     }
 
     private func saveContext() {

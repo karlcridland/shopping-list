@@ -14,8 +14,13 @@ struct PersistenceController {
     static let preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        let newItem = ShoppingList(context: viewContext)
-        newItem.lastUpdated = Date()
+//        let shoppingList = ShoppingList(context: viewContext)
+//        shoppingList.id = UUID().uuidString
+//        shoppingList.lastUpdated = Date()
+//        shoppingList.created = Date()
+//        shoppingList.title = "Test List"
+//        shoppingList.shopperData = [] as NSSet
+//        shoppingList.owner = "Test User"
         do {
             try viewContext.save()
         } catch {

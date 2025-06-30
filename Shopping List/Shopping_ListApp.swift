@@ -21,8 +21,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct Shopping_ListApp: App {
     
-    @Environment(\.managedObjectContext) private var context
-    
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var authViewModel = AuthViewModel()
     
@@ -34,7 +32,9 @@ struct Shopping_ListApp: App {
                 MainView(viewModel: authViewModel)
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .task {
+                        let context = persistenceController.container.viewContext
                         NotificationButtonModel.shared.startObserving(context: context)
+                        ShoppingListObserver.shared.startObserving(context: context)
                     }
             } else {
                 AuthView(viewModel: authViewModel)
@@ -45,14 +45,14 @@ struct Shopping_ListApp: App {
 }
 
 struct MainView: View {
-    
     @Environment(\.managedObjectContext) private var context
     @ObservedObject private var notificationModel = NotificationButtonModel.shared
+    @State private var selectedTab: Int = 0  // Track the selected tab
+
     var viewModel: AuthViewModel
 
     var body: some View {
-        TabView {
-            
+        TabView(selection: $selectedTab) {
             NavigationStack {
                 HomeView(context: context)
                     .navigationTitle("Shopping Lists")
@@ -69,7 +69,8 @@ struct MainView: View {
             .tabItem {
                 Label("Home", systemImage: "house")
             }
-            
+            .tag(0)
+
             NavigationStack {
                 FriendsView()
                     .navigationTitle("Friends")
@@ -86,6 +87,7 @@ struct MainView: View {
             .tabItem {
                 Label("Friends", systemImage: "person.2.fill")
             }
+            .tag(1)
 
             NavigationStack {
                 StatisticsView()
@@ -103,6 +105,7 @@ struct MainView: View {
             .tabItem {
                 Label("Stats", systemImage: "chart.pie")
             }
+            .tag(2)
 
             NavigationStack {
                 SettingsView(signOut: viewModel.signOut, deleteAccount: viewModel.deleteAccount)
@@ -115,6 +118,10 @@ struct MainView: View {
             .tabItem {
                 Label("Settings", systemImage: "gear")
             }
+            .tag(3)
+        }
+        .onChange(of: selectedTab) { (_, _) in
+            notificationModel.showNotificationSheet = false
         }
     }
 }

@@ -8,5 +8,6 @@
 class Database {
     
     static let users = UserDatabase()
+    static let shopping = ShoppingDatabase()
     
 }

@@ -35,12 +35,15 @@ struct ShoppingListHistoryView: View {
             List {
                 ForEach(shoppingList.completedItemsGroupedByDate, id: \.0) { group, items in
                     Section(group.label) {
-                        if let title = items.first?.dateOfPurchase {
+                        let grouped = groupItemsByDay(items)
+                        ForEach(grouped, id: \.key) { day, dayItems in
                             Button {
-                                self.results = items
-                                showingResults = true
+                                self.results = dayItems
+                                self.showingResults = true
                             } label: {
-                                Text(title)
+                                if let date = dayItems.first?.dateOfPurchase {
+                                    Text(date)
+                                }
                             }
                         }
                     }
@@ -50,6 +53,11 @@ struct ShoppingListHistoryView: View {
                 ShoppingHistoryResultsView(items: $results)
             }
         }
+    }
+    
+    func groupItemsByDay(_ items: [ShoppingItem]) -> [(key: String, value: [ShoppingItem])] {
+        Dictionary(grouping: items) { String($0.dayOfPurchase) }
+            .sorted { $0.key > $1.key }
     }
     
 }

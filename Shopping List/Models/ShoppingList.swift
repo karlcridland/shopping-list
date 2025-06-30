@@ -23,30 +23,33 @@ extension ShoppingList {
             item.id = UUID().uuidString
             item.list = self
         }
+        self.save()
     }
     
     func remove(_ item: ShoppingItem) {
         self.removeFromItems(item)
+        self.save()
     }
     
     func remove(_ item: ShoppingItem, context: NSManagedObjectContext) {
         self.removeFromItems(item)
         context.delete(item)
+        self.save()
     }
     
     var completedItemsGroupedByDate: [(PurchaseGroupKey, [ShoppingItem])] {
-            let completed = (self.items?.allObjects as? [ShoppingItem])?.filter { $0.basketDate != nil } ?? []
+        let completed = (self.items?.allObjects as? [ShoppingItem])?.filter { $0.basketDate != nil } ?? []
 
-            let grouped = Dictionary(grouping: completed) { item -> PurchaseGroupKey in
-                guard let date = item.basketDate else { return PurchaseGroupKey(year: 0, month: 0) }
-                let calendar = Calendar.current
-                let year = calendar.component(.year, from: date)
-                let month = calendar.component(.month, from: date)
-                return PurchaseGroupKey(year: year, month: month)
-            }
-
-            return grouped.sorted { $0.key < $1.key }
+        let grouped = Dictionary(grouping: completed) { item -> PurchaseGroupKey in
+            guard let date = item.basketDate else { return PurchaseGroupKey(year: 0, month: 0) }
+            let calendar = Calendar.current
+            let year = calendar.component(.year, from: date)
+            let month = calendar.component(.month, from: date)
+            return PurchaseGroupKey(year: year, month: month)
         }
+
+        return grouped.sorted { $0.key < $1.key }
+    }
     
     struct PurchaseGroupKey: Hashable, Comparable {
         let year: Int
@@ -59,10 +62,11 @@ extension ShoppingList {
 
         static func < (lhs: PurchaseGroupKey, rhs: PurchaseGroupKey) -> Bool {
             if lhs.year != rhs.year {
-                return lhs.year > rhs.year // most recent year first
+                return lhs.year > rhs.year
             }
-            return lhs.month > rhs.month // most recent month first
+            return lhs.month > rhs.month
         }
+        
     }
     
     var outstanding: [ShoppingItem] {
@@ -73,17 +77,7 @@ extension ShoppingList {
     }
     
     var shareText: String {
-        var results: [String] = []
-        self.outstanding.sorted(by: {$0.category < $1.category}).forEach { item in
-            if let title = item.title {
-                var text: [String] = [title]
-                if let describe = item.describe, !describe.isEmpty {
-                    text.append("\(describe)")
-                }
-                results.append("• \(text.joined(separator: " - "))")
-            }
-        }
-        return results.joined(separator: "\n")
+        self.outstanding.stringValue
     }
     
     public static func == (lhs: ShoppingList, rhs: ShoppingList) -> Bool {
@@ -91,3 +85,4 @@ extension ShoppingList {
     }
     
 }
+

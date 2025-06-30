@@ -28,8 +28,9 @@ struct ShoppingHistoryResultsView: View {
                         .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             SwipeButton(systemImage: "arrow.uturn.left.circle", label: "Undo", tint: Color(.accent)) {
                                 item.basketDate = nil
-                                try? context.save()
+                                item.list?.save()
                                 items.removeAll { $0.id == item.id }
+                                try? context.save()
                                 if (items.count == 0) {
                                     dismiss()
                                 }

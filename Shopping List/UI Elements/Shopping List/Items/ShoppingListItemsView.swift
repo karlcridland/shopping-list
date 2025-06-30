@@ -76,6 +76,7 @@ struct ShoppingListItemsView: View {
     private func deleteItem(_ item: ShoppingItem) {
         item.list = nil
         do {
+            shoppingList.save()
             try context.save()
         } catch {
             fatalError("Unresolved error \(error as NSError)")
@@ -88,9 +89,9 @@ struct ShoppingListItemsView: View {
     }
     
     private func markComplete(_ item: ShoppingItem) {
-        print("marking complete")
         item.basketDate = Date()
         do {
+            shoppingList.save()
             try context.save()
         }
         catch {
@@ -102,6 +103,7 @@ struct ShoppingListItemsView: View {
         withAnimation {
             for index in offsets {
                 context.delete(filteredItems[index])
+                shoppingList.save()
             }
             do {
                 try context.save()

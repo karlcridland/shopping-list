@@ -53,13 +53,13 @@ enum Category: String, CaseIterable, Identifiable, Comparable {
 extension ShoppingItem {
     var category: Category {
         get {
-            if let cat = categoryRaw as? String {
+            if let cat = categoryRaw {
                 return Category(rawValue: cat) ?? .miscellaneous
             }
             return .miscellaneous
         }
         set {
-            categoryRaw = newValue.rawValue as NSObject
+            categoryRaw = newValue.rawValue
         }
     }
 }

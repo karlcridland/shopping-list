@@ -24,7 +24,7 @@ struct HomeView: View {
                     viewModel.selectedList = shoppingList
                     viewModel.showShoppingList = true
                 }
-                    .contentShape(Rectangle())
+                .contentShape(Rectangle())
             }
             .onDelete(perform: viewModel.deleteLists)
 

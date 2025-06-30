@@ -45,12 +45,7 @@ struct ShoppingItemThumbnail: View {
 extension ShoppingItem {
     
     var image: UIImage? {
-        get {
-            return self.imageData as? UIImage
-        }
-        set {
-            return self.imageData = newValue
-        }
+        return nil
     }
     
 }

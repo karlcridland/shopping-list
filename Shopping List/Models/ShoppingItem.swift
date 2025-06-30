@@ -27,14 +27,12 @@ extension ShoppingItem {
             month.dateFormat = "MMMM"
             let year = calendar.component(.year, from: date)
             
-            
-            
             let suffix: String
             switch day {
-                case 1, 21, 31: suffix = "st"
-                case 2, 22: suffix = "nd"
-                case 3, 23: suffix = "rd"
-                default: suffix = "th"
+            case 1, 21, 31: suffix = "st"
+            case 2, 22: suffix = "nd"
+            case 3, 23: suffix = "rd"
+            default: suffix = "th"
             }
             
             return "\(day)\(suffix) \(month.string(from: date)) \(year)"
@@ -42,42 +40,35 @@ extension ShoppingItem {
         return nil
     }
     
-    var yearOfPurchase: Int? {
-        if let date = self.basketDate {
-            let calendar = Calendar.current
-            let year = calendar.component(.year, from: date)
-            return year
-        }
-        return nil
+    var yearOfPurchase: Int {
+        return self.basketDate?.componentValue(.year) ?? -1
     }
     
-    var monthOfPurchase: Int? {
-        if let date = self.basketDate {
-            let calendar = Calendar.current
-            let month = calendar.component(.month, from: date)
-            return month
-        }
-        return nil
+    var monthOfPurchase: Int {
+        return self.basketDate?.componentValue(.month) ?? -1
     }
     
-    var dayOfPurchase: Int? {
-        if let date = self.basketDate {
-            let calendar = Calendar.current
-            let day = calendar.component(.day, from: date)
-            return day
-        }
-        return nil
+    var dayOfPurchase: Int {
+        return self.basketDate?.componentValue(.day) ?? -1
     }
     
 }
 
-extension Int {
+extension [ShoppingItem] {
     
-    var toMonth: String {
-        if (self >= 0 && self < 12) {
-            return ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][self]
+    var stringValue: String {
+        var results: [String] = []
+        self.sorted(by: {$0.category < $1.category}).forEach { item in
+            if let title = item.title {
+                var text: [String] = [title]
+                if let describe = item.describe, !describe.isEmpty {
+                    text.append("\(describe)")
+                }
+                results.append("• \(text.joined(separator: " - "))")
+            }
         }
-        return ""
+        return results.joined(separator: "\n")
     }
     
 }
+
