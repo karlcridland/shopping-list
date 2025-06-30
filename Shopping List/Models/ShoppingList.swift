@@ -10,6 +10,13 @@ import CoreData
 
 extension ShoppingList {
     
+    func getOwner(_ context: NSManagedObjectContext) async -> Shopper? {
+        if let uid = self.owner {
+            return await Database.users.shoppers.get(uid, context)
+        }
+        return nil
+    }
+    
     func update(_ item: ShoppingItem, context: NSManagedObjectContext) {
         if let id = item.id,
            let items = self.items?.allObjects as? [ShoppingItem],

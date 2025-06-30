@@ -5,6 +5,7 @@
         <attribute name="givenName" attributeType="String"/>
         <attribute name="uid" attributeType="String"/>
         <relationship name="lists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ShoppingList" inverseName="shoppers" inverseEntity="ShoppingList"/>
+        <relationship name="owning" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ShoppingList" inverseName="ownerShopper" inverseEntity="ShoppingList"/>
     </entity>
     <entity name="ShoppingItem" representedClassName="ShoppingItem" syncable="YES" codeGenerationType="class">
         <attribute name="addedDate" attributeType="Date" usesScalarValueType="NO"/>
@@ -23,6 +24,7 @@
         <attribute name="shopperData" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="items" toMany="YES" deletionRule="Nullify" destinationEntity="ShoppingItem" inverseName="list" inverseEntity="ShoppingItem"/>
+        <relationship name="ownerShopper" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Shopper" inverseName="owning" inverseEntity="Shopper"/>
         <relationship name="shoppers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Shopper" inverseName="lists" inverseEntity="Shopper"/>
     </entity>
 </model>

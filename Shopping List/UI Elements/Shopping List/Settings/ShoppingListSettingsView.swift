@@ -25,14 +25,17 @@ struct ShoppingListSettingsView: View {
                         self.save(title: value)
                     }
             }
-//            Section("Shoppers") {
-//                let shoppers: [Shopper] = shoppingList.shoppers?.allObjects as? [Shopper] ?? []
-//                List {
-//                    ForEach(shoppers) { shopper in
-//                        Text(shopper.name ?? "")
-//                    }
-//                }
-//            }
+            Section("Shoppers") {
+                Text(shoppingList.ownerShopper?.name.full ?? "No owner")
+                ForEach(shoppingList.shoppersArray) { shopper in
+                    Text(shopper.name.full)
+                }
+                Button {
+                    
+                } label: {
+                    Text("Add shopper")
+                }
+            }
         }
     }
 
@@ -58,4 +61,10 @@ struct ShoppingListSettingsView: View {
 #Preview {
     let shoppingList: ShoppingList = ShoppingList(context: PersistenceController.preview.container.viewContext)
     ShoppingListView(shoppingList: shoppingList).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+}
+
+extension ShoppingList {
+    var shoppersArray: [Shopper] {
+        (shoppers?.allObjects as? [Shopper]) ?? []
+    }
 }

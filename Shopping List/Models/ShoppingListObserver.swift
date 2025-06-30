@@ -98,10 +98,10 @@ extension ShoppingList {
         }
         self.items = NSSet(array: shoppingItems)
         
-        if let shoppers = doc.get("shoppers") as? [String] {
-            self.shopperData = shoppers as NSObject
-
-            Task {
+        Task {
+            self.ownerShopper = await Database.users.shoppers.get(self.owner ?? "", context)
+            if let shoppers = doc.get("shoppers") as? [String] {
+                self.shopperData = shoppers as NSObject
                 var shopperList: [Shopper] = []
 
                 for id in shoppers {
