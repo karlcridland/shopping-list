@@ -1,5 +1,5 @@
 //
-//  ShoppingListHeader.swift
+//  ShoppingListHeaderView.swift
 //  Shopping List
 //
 //  Created by Karl Cridland on 23/06/2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ShoppingListHeader: View {
+struct ShoppingListHeaderView: View {
     
     @Binding var title: String?
     
