@@ -46,7 +46,8 @@ class ShoppingDatabase: BaseDatabase {
         }
     }
     
-    func getListeners(handle: @escaping (QuerySnapshot?, Error?) -> Void) -> [ListenerRegistration] {
+    func getListeners(handle: @escaping (String, QuerySnapshot?, Error?) -> Void) -> [ListenerRegistration] {
+        let id: String = UUID().uuidString
         var listeners: [ListenerRegistration] = []
         guard let uid = Auth.auth().currentUser?.uid else { return [] }
         let ref = self.db.collection("shopping_lists")
@@ -55,7 +56,7 @@ class ShoppingDatabase: BaseDatabase {
         [ownedLists, sharedLists].forEach { listener in
             listeners.append(
                 listener.addSnapshotListener { snapshot, error in
-                    handle(snapshot, error)
+                    handle(id, snapshot, error)
                 }
             )
         }

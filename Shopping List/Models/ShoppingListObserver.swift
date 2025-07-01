@@ -10,7 +10,6 @@ import CoreData
 import FirebaseAuth
 import FirebaseFirestore
 
-
 final class ShoppingListObserver: ObservableObject {
     
     static let shared = ShoppingListObserver()
@@ -18,17 +17,24 @@ final class ShoppingListObserver: ObservableObject {
     var deleteList: [String] = []
     
     private var listeners: [ListenerRegistration] = []
+    private var listeningFor: [String] = []
+    
+    @Published var hasSynced: Bool = false
     
     private init() {}
-    
     func startObserving(context: NSManagedObjectContext) {
         stopObserving()
-        self.listeners = Database.shopping.getListeners { (snapshot, error) in
-            self.handle(snapshot: snapshot, error: error, context: context)
+
+        self.listeners = Database.shopping.getListeners { (id, snapshot, error) in
+            self.listeningFor.append(id)
+            self.handle(snapshot: snapshot, error: error, context: context) {
+                self.listeningFor.removeAll(where: {$0 == id})
+                self.hasSynced = self.listeningFor.isEmpty
+            }
         }
     }
 
-    private func handle(snapshot: QuerySnapshot?, error: Error?, context: NSManagedObjectContext) {
+    private func handle(snapshot: QuerySnapshot?, error: Error?, context: NSManagedObjectContext, onFinish: @escaping () -> Void) {
         guard let documents = snapshot?.documents else {
             print("Error syncing shopping lists: \(error?.localizedDescription ?? "Unknown error")")
             return
@@ -44,9 +50,9 @@ final class ShoppingListObserver: ObservableObject {
                         }
                     }
                 }
-
                 do {
                     try context.save()
+                    onFinish()
                 } catch {
                     print("Failed to download lists: \(error.localizedDescription)")
                 }
@@ -81,6 +87,7 @@ extension ShoppingList {
         self.owner = doc.get("owner") as? String
         self.created = (doc.get("created") as? Timestamp)?.dateValue()
         self.lastUpdated = (doc.get("lastUpdated") as? Timestamp)?.dateValue()
+        self.shopperData = NSSet(array: doc.get("shoppers") as? [String] ?? [])
         
         var shoppingItems: [ShoppingItem] = []
         if let itemsData = doc.get("items") as? [[String: Any]] {
@@ -100,8 +107,7 @@ extension ShoppingList {
         
         Task {
             self.ownerShopper = await Database.users.shoppers.get(self.owner ?? "", context)
-            if let shoppers = doc.get("shoppers") as? [String] {
-                self.shopperData = shoppers as NSObject
+            if let shoppers = shopperData as? [String] {
                 var shopperList: [Shopper] = []
 
                 for id in shoppers {

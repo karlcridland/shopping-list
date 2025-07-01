@@ -31,8 +31,3 @@ struct ShoppingListMenuButton: View {
     }
     
 }
-
-#Preview {
-    let shoppingList: ShoppingList = ShoppingList(context: PersistenceController.preview.container.viewContext)
-    ShoppingListView(shoppingList: shoppingList).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-}

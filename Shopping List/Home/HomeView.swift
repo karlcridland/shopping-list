@@ -27,7 +27,7 @@ struct HomeView: View {
                 .contentShape(Rectangle())
             }
             .onDelete(perform: viewModel.deleteLists)
-
+            
             NewShoppingListThumbnail {
                 viewModel.createList()
             }
@@ -39,7 +39,6 @@ struct HomeView: View {
                 ShoppingListView(shoppingList: shoppingList)
             }
         }
-        
     }
     
 }

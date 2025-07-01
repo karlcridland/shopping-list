@@ -11,11 +11,11 @@ import UIKit
 struct ShoppingItemThumbnail: View {
     
     @State var item: ShoppingItem
-    var onClick: () -> Void
+    var onClick: (() -> Void)?
     
     var body: some View {
         Button {
-            onClick()
+            onClick?()
         } label: {
             HStack {
                 VStack(alignment: .leading) {

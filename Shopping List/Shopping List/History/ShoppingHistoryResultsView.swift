@@ -6,48 +6,67 @@
 //
 
 import SwiftUI
+import CoreData
+
+class ShoppingHistoryResultsViewModel: ObservableObject {
+    @Published var items: [ShoppingItem]
+
+    init(items: [ShoppingItem]) {
+        self.items = items
+    }
+
+    var categories: [Category] {
+        Array(Set(items.compactMap { $0.category })).sorted()
+    }
+    
+    func undoItem(_ item: ShoppingItem, _ context: NSManagedObjectContext) {
+        item.basketDate = nil
+        item.list?.save()
+        items.removeAll { $0.id == item.id }
+        try? context.save()
+    }
+    
+}
+
 
 struct ShoppingHistoryResultsView: View {
     @Environment(\.managedObjectContext) private var context
     @Environment(\.dismiss) var dismiss
-    
-    @Binding var items: [ShoppingItem]
-    
+
+    @StateObject private var viewModel: ShoppingHistoryResultsViewModel
+
+    init(items: [ShoppingItem]) {
+        _viewModel = StateObject(wrappedValue: ShoppingHistoryResultsViewModel(items: items))
+    }
+
     var body: some View {
-        List {
-            let categories = Array(Set(items.compactMap { $0.category })).sorted()
-            
-            ForEach(categories, id: \.self) { category in
-                let filtered = items.filter { $0.category == category }
-                Section(category.rawValue) {
-                    ForEach(filtered) { item in
-                        ShoppingItemThumbnail(item: item, onClick: {
-//                            preview(item)
-                        })
-                        .disabled(true)
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            SwipeButton(systemImage: "arrow.uturn.left.circle", label: "Undo", tint: Color(.accent)) {
-                                item.basketDate = nil
-                                item.list?.save()
-                                items.removeAll { $0.id == item.id }
-                                try? context.save()
-                                if (items.count == 0) {
-                                    dismiss()
+        let groupedItems = Dictionary(grouping: viewModel.items, by: { $0.category })
+        let sortedCategories = viewModel.categories
+
+        return List {
+            ForEach(sortedCategories, id: \.self) { category in
+                if let filteredItems = groupedItems[category] {
+                    Section(category.rawValue) {
+                        ForEach(filteredItems) { item in
+                            ShoppingItemThumbnail(item: item)
+                                .disabled(true)
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    SwipeButton(
+                                        systemImage: "arrow.uturn.left.circle",
+                                        label: "Undo",
+                                        tint: Color(.accent)
+                                    ) {
+                                        viewModel.undoItem(item, context)
+                                        if viewModel.items.isEmpty {
+                                            dismiss()
+                                        }
+                                    }
                                 }
-                            }
                         }
-//                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-//                            SwipeButton(isDestructive: true, systemImage: "trash", label: "Delete") {
-//                                deleteItem(item)
-//                            }
-//                        }
                     }
                 }
             }
         }
-        .task {
-            print(items.count)
-        }
     }
-    
+
 }

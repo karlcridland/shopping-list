@@ -20,29 +20,42 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct Shopping_ListApp: App {
-    
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var authViewModel = AuthViewModel()
-    
+    @StateObject private var observer = ShoppingListObserver.shared
+
     let persistenceController = PersistenceController.shared
-    
+
     var body: some Scene {
         WindowGroup {
-            if Auth.auth().currentUser != nil {
-                MainView(viewModel: authViewModel)
-                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .task {
-                        let context = persistenceController.container.viewContext
-                        NotificationButtonModel.shared.startObserving(context: context)
-                        ShoppingListObserver.shared.startObserving(context: context)
+            let context = persistenceController.container.viewContext
+
+            Group {
+                if Auth.auth().currentUser != nil {
+                    if observer.hasSynced {
+                        MainView(viewModel: authViewModel)
+                            .environment(\.managedObjectContext, context)
+                            .onAppear {
+                                NotificationButtonModel.shared.startObserving(context: context)
+                            }
+                    } else {
+                        ProgressView("Syncing Shopping Lists...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.accentColor)
+                            .onAppear {
+                                observer.startObserving(context: context)
+                            }
                     }
-            } else {
-                AuthView(viewModel: authViewModel)
-                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                } else {
+                    AuthView(viewModel: authViewModel)
+                        .environment(\.managedObjectContext, context)
+                }
             }
         }
     }
 }
+
 
 struct MainView: View {
     @Environment(\.managedObjectContext) private var context

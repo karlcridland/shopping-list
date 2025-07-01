@@ -20,7 +20,7 @@ class HomeViewModel: ObservableObject {
 
     init(context: NSManagedObjectContext) {
         self.context = context
-        fetchLists()
+        self.fetchLists()
     }
 
     func fetchLists() {
