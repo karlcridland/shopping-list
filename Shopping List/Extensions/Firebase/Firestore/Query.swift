@@ -9,6 +9,7 @@ import CoreData
 import FirebaseFirestore
 
 extension Query {
+    
     func observe(_ context: NSManagedObjectContext) {
         self.addSnapshotListener { snapshot, error in
             guard let documents = snapshot?.documents else {
@@ -51,4 +52,5 @@ extension Query {
             }
         }
     }
+    
 }

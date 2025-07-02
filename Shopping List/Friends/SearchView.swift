@@ -19,11 +19,10 @@ struct SearchView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Add spacing above
             Spacer(minLength: 16)
 
             withAnimation {
-                TextField("Search e.g. John Appleseed", text: $viewModel.query)
+                TextField("e.g. John Appleseed", text: $viewModel.query)
                     .contentMargins(.trailing, isFocused ? 100 : 0)
                     .padding(16)
                     .background(.frost)
@@ -43,11 +42,9 @@ struct SearchView: View {
                 ResultsView(results: viewModel.results, showDuplicateRequestAlert: $viewModel.showDuplicateRequestAlert)
             }
 
-            Spacer(minLength: 0) // Optional: fills bottom space if no results
+            Spacer(minLength: 0)
         }
-        .onAppear {
-            self.isFocused = true
-        }
+        .background(Color(.systemGroupedBackground))
     }
     
     struct ResultsView: View {

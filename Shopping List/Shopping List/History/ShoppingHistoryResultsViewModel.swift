@@ -1,3 +1,9 @@
+//
+//  ShoppingHistoryResultsViewModel.swift
+//  Shopping List
+//
+//  Created by Karl Cridland on 01/07/2025.
+//
 
 import CoreData
 

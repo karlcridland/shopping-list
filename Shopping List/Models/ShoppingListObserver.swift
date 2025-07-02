@@ -22,7 +22,7 @@ final class ShoppingListObserver: ObservableObject {
     @Published var hasSynced: Bool = false
     
     private init() {}
-    func startObserving(context: NSManagedObjectContext) {
+    func startObserving(context: NSManagedObjectContext, onFinish: @escaping () -> Void) {
         stopObserving()
 
         self.listeners = Database.shopping.getListeners { (id, snapshot, error) in
@@ -30,6 +30,9 @@ final class ShoppingListObserver: ObservableObject {
             self.handle(snapshot: snapshot, error: error, context: context) {
                 self.listeningFor.removeAll(where: {$0 == id})
                 self.hasSynced = self.listeningFor.isEmpty
+                if (self.hasSynced) {
+                    onFinish()
+                }
             }
         }
     }

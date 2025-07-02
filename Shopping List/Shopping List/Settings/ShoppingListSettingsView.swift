@@ -14,6 +14,8 @@ struct ShoppingListSettingsView: View {
     @ObservedObject var shoppingList: ShoppingList
     
     @FocusState.Binding var focusTitleEdit: Bool
+    
+    let delay = KeyboardDelay()
 
     var body: some View {
         List {
@@ -22,7 +24,12 @@ struct ShoppingListSettingsView: View {
                     .focused($focusTitleEdit)
                     .submitLabel(.done)
                     .onChange(of: title.wrappedValue) { (_, value) in
-                        self.save(title: value)
+                        shoppingList.title = value.count > 0 ? value : nil
+                        self.delay.onType {
+                            Task {
+                                self.save(title: value.cleaned)
+                            }
+                        }
                     }
             }
             Section("Shoppers") {
@@ -46,9 +53,9 @@ struct ShoppingListSettingsView: View {
         )
     }
     
+    @MainActor
     private func save(title: String) {
         do {
-            shoppingList.title = title.count > 0 ? title : nil
             shoppingList.save()
             try context.save()
         } catch {
@@ -58,13 +65,29 @@ struct ShoppingListSettingsView: View {
     
 }
 
-#Preview {
-    let shoppingList: ShoppingList = ShoppingList(context: PersistenceController.preview.container.viewContext)
-    ShoppingListView(shoppingList: shoppingList).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-}
-
 extension ShoppingList {
     var shoppersArray: [Shopper] {
         (shoppers?.allObjects as? [Shopper]) ?? []
     }
+}
+
+class KeyboardDelay {
+    
+    var clickCount: Int = 0
+    var time: TimeInterval
+    
+    init(_ time: TimeInterval = 0.4) {
+        self.time = time
+    }
+    
+    func onType(onValid: @escaping () -> Void) {
+        clickCount += 1
+        let localCount = clickCount
+        Timer.scheduledTimer(withTimeInterval: time, repeats: false) { _ in
+            if (self.clickCount == localCount) {
+                onValid()
+            }
+        }
+    }
+    
 }
