@@ -21,11 +21,18 @@ class ShopperDatabase: BaseDatabase {
         }
     }
     
+    var cached_users: [String: Shopper] = [:]
+    
     func get(_ uid: String?, _ context: NSManagedObjectContext) async -> Shopper? {
         if let uid = uid {
+            if let shopper = cached_users[uid] {
+                return shopper
+            }
             do {
                 let snapshot = try await db.document("users/\(uid)").getDocument()
-                return snapshot.shopper(from: context)
+                let shopper = snapshot.shopper(from: context)
+                cached_users[uid] = shopper
+                return shopper
             } catch {
                 print("Error getting shopper: \(error.localizedDescription)")
                 return nil

@@ -28,23 +28,25 @@ class HomeViewModel: ObservableObject {
         request.sortDescriptors = [NSSortDescriptor(keyPath: \ShoppingList.lastUpdated, ascending: false)]
 
         do {
-            self.shoppingLists = try context.fetch(request)
+            self.shoppingLists = try context.fetch(request).filter({!ShoppingListObserver.shared.shouldIgnore($0.id)})
         } catch {
             print("Failed to fetch shopping lists: \(error)")
         }
     }
 
     func createList() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
         let list = ShoppingList(context: context)
         list.id = UUID().uuidString
+        list.title = ""
         list.created = Date()
         list.lastUpdated = Date()
-        list.owner = Auth.auth().currentUser?.uid
-        list.shopperData = [] as NSSet
+        list.owner = uid
+        list.shopperData = NSSet(array: [])
         list.save()
 
-        saveContext()
         fetchLists()
+        try? context.save()
         selectedList = list
         showShoppingList = true
     }
@@ -53,20 +55,22 @@ class HomeViewModel: ObservableObject {
         for index in offsets {
             let shoppingList = shoppingLists[index]
             Task {
+                if let id = shoppingList.id {
+                    ShoppingListObserver.shared.deleteList.append(id)
+                }
                 await shoppingList.delete()
                 context.delete(shoppingList)
             }
         }
-        saveContext()
-        fetchLists()
-        selectedList?.save()
-    }
-
-    private func saveContext() {
-        do {
-            try context.save()
-        } catch {
-            print("Error saving context: \(error)")
+        Task {
+            fetchLists()
+            do {
+                try context.save()
+            }
+            catch {
+                print("Error deleting list:", error.localizedDescription)
+            }
         }
     }
+    
 }

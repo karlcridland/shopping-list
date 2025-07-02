@@ -1,9 +1,19 @@
+//
+//  ShoppingListSettingsViewModel.swift
+//  Shopping List
+//
+//  Created by Karl Cridland on 02/07/2025.
+//
 
+import SwiftUI
 import CoreData
+import FirebaseAuth
 
 class ShoppingListSettingsViewModel: ObservableObject {
     
     @Published var shoppingList: ShoppingList
+    
+    let delay = KeyboardDelay()
     
     init(shoppingList: ShoppingList) {
         self.shoppingList = shoppingList
@@ -24,6 +34,14 @@ class ShoppingListSettingsViewModel: ObservableObject {
         } catch {
             print("Error saving:", error.localizedDescription)
         }
+    }
+    
+    var isOwnedByUser: Bool {
+        if let uid = Auth.auth().currentUser?.uid,
+           let owner = shoppingList.owner {
+            return uid == owner
+        }
+        return false
     }
     
 }

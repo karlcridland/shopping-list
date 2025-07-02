@@ -11,55 +11,67 @@ struct ShoppingListSettingsView: View {
     
     @Environment(\.managedObjectContext) private var context
     
-    @ObservedObject var shoppingList: ShoppingList
+    @StateObject private var viewModel: ShoppingListSettingsViewModel
     
     @FocusState.Binding var focusTitleEdit: Bool
     
-    let delay = KeyboardDelay()
+    let font: Font = .system(size: 16, weight: .medium)
+    
+    init(shoppingList: ShoppingList, focusTitleEdit: FocusState<Bool>.Binding) {
+        _viewModel = StateObject(wrappedValue: ShoppingListSettingsViewModel(shoppingList: shoppingList))
+        _focusTitleEdit = focusTitleEdit
+    }
 
     var body: some View {
         List {
             Section("Title") {
-                TextField("e.g. The Weekly Shop", text: title)
+                TextField("e.g. The Weekly Shop", text: viewModel.title)
+                    .font(self.font)
                     .focused($focusTitleEdit)
                     .submitLabel(.done)
-                    .onChange(of: title.wrappedValue) { (_, value) in
-                        shoppingList.title = value.count > 0 ? value : nil
-                        self.delay.onType {
+                    .onChange(of: viewModel.title.wrappedValue) { (_, value) in
+                        viewModel.shoppingList.title = value.count > 0 ? value : nil
+                        viewModel.delay.onType {
                             Task {
-                                self.save(title: value.cleaned)
+                                viewModel.save(title: value.cleaned, context)
                             }
                         }
                     }
             }
             Section("Shoppers") {
-                Text(shoppingList.ownerShopper?.name.full ?? "No owner")
-                ForEach(shoppingList.shoppersArray) { shopper in
+                Text(viewModel.shoppingList.ownerShopper?.name.full ?? "No owner")
+                    .font(self.font)
+                ForEach(viewModel.shoppingList.shoppersArray) { shopper in
                     Text(shopper.name.full)
+                        .font(self.font)
                 }
                 Button {
                     
                 } label: {
                     Text("Add shopper")
+                        .font(self.font)
                 }
             }
-        }
-    }
-
-    private var title: Binding<String> {
-        Binding<String>(
-            get: { shoppingList.title ?? "" },
-            set: { shoppingList.title = $0 }
-        )
-    }
-    
-    @MainActor
-    private func save(title: String) {
-        do {
-            shoppingList.save()
-            try context.save()
-        } catch {
-            print("Error saving:", error.localizedDescription)
+            Section {
+                Button {
+                    
+                } label: {
+                    VStack(alignment: .leading) {
+                        Text(viewModel.isOwnedByUser ? "Delete List" : "Remove yourself from this list")
+                            .font(self.font)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .foregroundStyle(Color(.systemRed))
+            } header: {
+                Text("Remove List")
+            } footer: {
+                Text(viewModel.isOwnedByUser ? "This is permanent and can't be undone." : "You can be added back later")
+                    .font(.footnote)
+                    .fontWeight(.regular)
+                    .multilineTextAlignment(.leading)
+            }
+            
         }
     }
     

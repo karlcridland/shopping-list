@@ -81,6 +81,13 @@ final class ShoppingListObserver: ObservableObject {
         listeners.forEach { $0.remove() }
         listeners.removeAll()
     }
+    
+    func shouldIgnore(_ id: String?) -> Bool {
+        if let id = id {
+            return self.deleteList.contains(id)
+        }
+        return false
+    }
 }
 
 extension ShoppingList {
@@ -141,6 +148,10 @@ extension ShoppingList {
     }
     
     func shouldUpdate(from timestamp: Timestamp?) -> Bool {
+        if (!self.hasUpdated) {
+            self.hasUpdated = true
+            return true
+        }
         if let date = timestamp?.dateValue(),
            let original = self.lastUpdated {
             return date >= original
