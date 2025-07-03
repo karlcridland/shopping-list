@@ -22,6 +22,7 @@ struct PersistenceController {
 //        shoppingList.shopperData = [] as NSSet
 //        shoppingList.owner = "Test User"
         do {
+            print("10. persistence save")
             try viewContext.save()
         } catch {
             // Replace this implementation with code to handle the error appropriately.

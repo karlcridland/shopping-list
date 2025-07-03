@@ -46,31 +46,37 @@ class HomeViewModel: ObservableObject {
         list.save()
 
         fetchLists()
+        print("2. saving after list creation")
         try? context.save()
         selectedList = list
         showShoppingList = true
     }
 
     func deleteLists(at offsets: IndexSet) {
-        for index in offsets {
-            let shoppingList = shoppingLists[index]
-            Task {
+        Task {
+            var deleted = false
+            for index in offsets {
+                let shoppingList = shoppingLists[index]
+
                 if let id = shoppingList.id {
                     ShoppingListObserver.shared.deleteList.append(id)
                 }
+                
                 await shoppingList.delete()
+
                 context.delete(shoppingList)
+                deleted = true
             }
-        }
-        Task {
-            fetchLists()
-            do {
-                try context.save()
-            }
-            catch {
-                print("Error deleting list:", error.localizedDescription)
+
+            if deleted {
+                do {
+                    print("3. Saving after list deletion")
+                    try context.save()
+                    fetchLists()
+                } catch {
+                    print("Error deleting list:", error.localizedDescription)
+                }
             }
         }
     }
-    
 }

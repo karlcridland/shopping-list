@@ -23,23 +23,27 @@ struct ShoppingListItemsView: View {
 
     var body: some View {
         let categories = viewModel.categories()
-
-        if viewModel.items.isEmpty {
-            NoItemsDefault()
-        } else {
-            List {
-                ForEach(categories, id: \.self) { category in
-                    let filteredItems = viewModel.items(for: category)
-                    ShoppingCategorySection(
-                        category: category,
-                        items: filteredItems,
-                        onEdit: onEdit,
-                        onComplete: viewModel.markComplete,
-                        onDelete: viewModel.deleteItem,
-                        onPreview: viewModel.preview
-                    )
+        ZStack {
+            if viewModel.items.isEmpty {
+                NoItemsDefault()
+            } else {
+                List {
+                    ForEach(categories, id: \.self) { category in
+                        let filteredItems = viewModel.items(for: category)
+                        ShoppingCategorySection(
+                            category: category,
+                            items: filteredItems,
+                            onEdit: onEdit,
+                            onComplete: viewModel.markComplete,
+                            onDelete: viewModel.deleteItem,
+                            onPreview: viewModel.preview
+                        )
+                    }
                 }
             }
+        }
+        .onAppear{
+            viewModel.fetchItems()
         }
     }
 

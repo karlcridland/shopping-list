@@ -49,6 +49,7 @@ class ShoppingListViewModel: ObservableObject {
     func saveItem(_ item: ShoppingItem) {
         do {
             shoppingList.update(item, context: context)
+            print("9. saving when updating/creating an item")
             try context.save()
         } catch {
             print("Failed to save item: \(error.localizedDescription)")

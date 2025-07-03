@@ -18,6 +18,7 @@ extension ShoppingList {
     }
     
     func update(_ item: ShoppingItem, context: NSManagedObjectContext) {
+        self.lastUpdated = Date()
         if let id = item.id,
            let items = self.items?.allObjects as? [ShoppingItem],
            let original = items.first(where: {$0.id == id}) {

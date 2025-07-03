@@ -1,5 +1,5 @@
 //
-//  ProfileImageLoader.swift
+//  ProfileImageViewModel.swift
 //  Shopping List
 //
 //  Created by Karl Cridland on 26/06/2025.
@@ -9,7 +9,7 @@
 import FirebaseStorage
 import SwiftUI
 
-class ProfileImageLoader: ObservableObject {
+class ProfileImageViewModel: ObservableObject {
     @Published var image: UIImage?
 
     private var storage = Storage.storage()

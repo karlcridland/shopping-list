@@ -1,13 +1,13 @@
 //
-//  NoHistoryDefault.swift
+//  NoShoppersDefault.swift
 //  Shopping List
 //
-//  Created by Karl Cridland on 23/06/2025.
+//  Created by Karl Cridland on 03/07/2025.
 //
 
 import SwiftUI
 
-struct NoHistoryDefault: View {
+struct NoShoppersDefault: View {
     
     private let iconColor: Color = Color(.charcoal).opacity(0.6)
     
@@ -15,7 +15,7 @@ struct NoHistoryDefault: View {
         VStack {
             Spacer()
             VStack(spacing: 24) {
-                Text("Mark an item as complete to view your history.")
+                Text("Add more friends.")
                     .frame(maxWidth: 300)
                     .foregroundStyle(iconColor)
                     .font(.system(size: 14, weight: .semibold))

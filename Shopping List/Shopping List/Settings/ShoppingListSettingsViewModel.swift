@@ -13,7 +13,10 @@ class ShoppingListSettingsViewModel: ObservableObject {
     
     @Published var shoppingList: ShoppingList
     
+    let font: Font = .system(size: 15, weight: .medium)
     let delay = KeyboardDelay()
+    
+    @Published var showShoppingList: Bool = false
     
     init(shoppingList: ShoppingList) {
         self.shoppingList = shoppingList
@@ -30,6 +33,7 @@ class ShoppingListSettingsViewModel: ObservableObject {
     func save(title: String, _ context: NSManagedObjectContext) {
         do {
             self.shoppingList.save()
+            print("7. saving in list settings")
             try context.save()
         } catch {
             print("Error saving:", error.localizedDescription)
@@ -42,6 +46,17 @@ class ShoppingListSettingsViewModel: ObservableObject {
             return uid == owner
         }
         return false
+    }
+    
+    func addShopper(_ uid: String, _ context: NSManagedObjectContext) {
+        self.shoppingList.setUniqueShoppers()
+        if var shoppers = self.shoppingList.shopperData as? [String], !shoppers.contains(uid) {
+            shoppers.append(uid)
+            self.shoppingList.shopperData = shoppers as NSObject
+            self.shoppingList.save()
+            print("8. saving when adding shopper to list")
+            try? context.save()
+        }
     }
     
 }

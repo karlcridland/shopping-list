@@ -14,6 +14,25 @@ class FriendsDatabase: BaseDatabase {
     
     let requests = RequestsDatabase()
     
+    func get(_ context: NSManagedObjectContext) async -> [Shopper] {
+        guard let uid = Auth.auth().currentUser?.uid else { return [] }
+        
+        let snapshot = try? await db.collection("users").document(uid).collection("friends").getDocuments()
+        
+        guard let documents = snapshot?.documents else { return [] }
+        
+        var shoppers: [Shopper] = []
+        
+        for doc in documents {
+            if let shopper = await Database.users.shoppers.get(doc.documentID, context) {
+                shoppers.append(shopper)
+            }
+        }
+        
+        return shoppers
+    }
+
+    
     func mutualFriends(to uid: String) async -> Int {
         guard let currentUID = Auth.auth().currentUser?.uid else { return 0 }
 

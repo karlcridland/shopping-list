@@ -22,6 +22,7 @@ class ShoppingHistoryResultsViewModel: ObservableObject {
         item.basketDate = nil
         item.list?.save()
         items.removeAll { $0.id == item.id }
+        print("5. saving after undoing completion")
         try? context.save()
     }
     

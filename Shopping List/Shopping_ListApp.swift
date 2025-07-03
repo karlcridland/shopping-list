@@ -36,6 +36,7 @@ struct Shopping_ListApp: App {
                             .background(Color.accentColor)
                             .onAppear {
                                 observer.startObserving(context: context) {
+                                    print("11. saving initial load")
                                     try? context.save()
                                 }
                             }

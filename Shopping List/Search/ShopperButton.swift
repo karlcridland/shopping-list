@@ -10,7 +10,6 @@ import SwiftUI
 struct ShopperButton: View {
 
     @StateObject private var viewModel: ShopperButtonViewModel
-    @StateObject private var imageLoader = ProfileImageLoader()
     
     private let buttonSize: CGFloat = 32
     private let padding: CGFloat = 8
@@ -25,21 +24,9 @@ struct ShopperButton: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            if let image = imageLoader.image {
-                Image(uiImage: image)
-                    .frame(width: buttonSize + (2 * pictureVariance), height: buttonSize + (2 * pictureVariance))
-                    .background(Color(.systemGroupedBackground))
-                    .clipShape(.circle)
-                    .padding([.vertical, .trailing], padding - pictureVariance)
-            } else {
-                Image(systemName: "person.fill")
-                    .font(.system(size: 24, weight: .bold))
-                    .frame(width: buttonSize + (2 * pictureVariance), height: buttonSize + (2 * pictureVariance))
-                    .background(Color(.systemGroupedBackground))
-                    .foregroundStyle(Color(.charcoal))
-                    .clipShape(.circle)
-                    .padding([.vertical, .trailing], padding - pictureVariance)
-            }
+            let size: CGFloat = buttonSize + (2 * pictureVariance)
+            let padding: CGFloat = padding - pictureVariance
+            ProfileImageView(uid: viewModel.shopper.uid ?? "", size: size, padding: padding)
             VStack(alignment: .leading) {
                 Text(viewModel.shopper.name.full)
                     .font(.title3)

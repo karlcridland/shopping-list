@@ -18,6 +18,7 @@ final class ShoppingListObserver: ObservableObject {
     
     private var listeners: [ListenerRegistration] = []
     private var listeningFor: [String] = []
+    private var hasUpdated: [String] = []
     
     @Published var hasSynced: Bool = false
     
@@ -48,12 +49,14 @@ final class ShoppingListObserver: ObservableObject {
                 for doc in documents {
                     if (!self.deleteList.contains(doc.documentID)) {
                         let list = self.fetchOrCreateList(id: doc.documentID, context: context)
-                        if list.shouldUpdate(from: (doc.get("lastUpdated") as? Timestamp)) {
+                        if list.shouldUpdate(from: (doc.get("lastUpdated") as? Timestamp), firstUpdate: !self.hasUpdated.contains(doc.documentID)) {
                             list.extract(from: doc, context: context)
                         }
+                        self.hasUpdated.append(doc.documentID)
                     }
                 }
                 do {
+                    print("4. saving after observed update")
                     try context.save()
                     onFinish()
                 } catch {
@@ -92,12 +95,24 @@ final class ShoppingListObserver: ObservableObject {
 
 extension ShoppingList {
     
+    func setUniqueShoppers() {
+        if let data = self.shopperData as? [String] {
+            let uniqueData = Array(Set(data))
+            self.shopperData = NSSet(array: uniqueData)
+        }
+    }
+    
     func extract(from doc: QueryDocumentSnapshot, context: NSManagedObjectContext) {
         self.title = doc.get("title") as? String
         self.owner = doc.get("owner") as? String
         self.created = (doc.get("created") as? Timestamp)?.dateValue()
         self.lastUpdated = (doc.get("lastUpdated") as? Timestamp)?.dateValue()
-        self.shopperData = NSSet(array: doc.get("shoppers") as? [String] ?? [])
+        self.shopperData = (doc.get("shoppers") as? [String] ?? []) as NSObject
+        self.setUniqueShoppers()
+        
+        if let data = self.shopperData as? [String] {
+            print(data)
+        }
         
         var shoppingItems: [ShoppingItem] = []
         if let itemsData = doc.get("items") as? [[String: Any]] {
@@ -117,7 +132,7 @@ extension ShoppingList {
         
         Task {
             self.ownerShopper = await Database.users.shoppers.get(self.owner ?? "", context)
-            if let shoppers = shopperData as? [String] {
+            if let shoppers = self.shopperData as? [String] {
                 var shopperList: [Shopper] = []
 
                 for id in shoppers {
@@ -147,14 +162,14 @@ extension ShoppingList {
         }
     }
     
-    func shouldUpdate(from timestamp: Timestamp?) -> Bool {
-        if (!self.hasUpdated) {
-            self.hasUpdated = true
+    func shouldUpdate(from timestamp: Timestamp?, firstUpdate: Bool) -> Bool {
+        if (firstUpdate) {
             return true
         }
         if let date = timestamp?.dateValue(),
            let original = self.lastUpdated {
-            return date >= original
+            print(date, original)
+            return date > original
         }
         return true
     }

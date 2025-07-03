@@ -55,6 +55,7 @@ class ShoppingListItemsViewModel: ObservableObject {
     func save() {
         do {
             shoppingList.save()
+            print("6. saving on list save")
             try context.save()
             fetchItems()
         } catch {

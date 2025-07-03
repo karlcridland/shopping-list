@@ -47,6 +47,7 @@ extension Query {
                 }
 
                 await context.perform {
+                    print("1. saving query download")
                     try? context.save()
                 }
             }
