@@ -19,18 +19,25 @@ struct HomeView: View {
 
     var body: some View {
         List {
-            ForEach(viewModel.shoppingLists) { shoppingList in
-                ShoppingListThumbnailView(shoppingList: shoppingList, context: context) {
+            ForEach(viewModel.shoppingLists, id: \.id) { shoppingList in
+                ShoppingListThumbnailView(shoppingList: shoppingList) {
                     viewModel.selectedList = shoppingList
                     viewModel.showShoppingList = true
                 }
                 .contentShape(Rectangle())
             }
-            .onDelete(perform: viewModel.deleteLists)
+            .onDelete { indexSet in
+                withAnimation {
+                    viewModel.deleteLists(at: indexSet)
+                }
+            }
             
             NewShoppingListThumbnail {
                 viewModel.createList()
             }
+        }
+        .onAppear {
+            viewModel.fetchLists()
         }
         .listRowSpacing(10)
         .contentMargins(.top, 12)

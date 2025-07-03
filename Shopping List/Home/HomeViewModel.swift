@@ -53,17 +53,17 @@ class HomeViewModel: ObservableObject {
     }
 
     func deleteLists(at offsets: IndexSet) {
+        let listsToDelete = offsets.map { shoppingLists[$0] }
+        shoppingLists.remove(atOffsets: offsets)
         Task {
             var deleted = false
-            for index in offsets {
-                let shoppingList = shoppingLists[index]
 
+            for shoppingList in listsToDelete {
                 if let id = shoppingList.id {
                     ShoppingListObserver.shared.deleteList.append(id)
                 }
-                
-                await shoppingList.delete()
 
+                await shoppingList.delete()
                 context.delete(shoppingList)
                 deleted = true
             }
@@ -79,4 +79,5 @@ class HomeViewModel: ObservableObject {
             }
         }
     }
+
 }

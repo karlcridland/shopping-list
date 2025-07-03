@@ -14,7 +14,7 @@ class ShoppingListSettingsShoppersViewModel: ObservableObject {
     
     init(shoppingList: ShoppingList) {
         self.shoppingList = shoppingList
-        self.shoppers = shoppingList.shoppersArray
+        self.shoppers = shoppingList.shoppers as? [Shopper] ?? []
     }
     
     func removeUser(_ uid: String?, _ context: NSManagedObjectContext) {
@@ -29,7 +29,7 @@ class ShoppingListSettingsShoppersViewModel: ObservableObject {
     }
     
     func fetchShoppers() {
-        self.shoppers = shoppingList.shoppersArray
+        self.shoppers = shoppingList.shoppers as? [Shopper] ?? []
     }
     
 }

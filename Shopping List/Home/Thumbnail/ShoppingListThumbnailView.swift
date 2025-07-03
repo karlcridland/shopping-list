@@ -10,12 +10,14 @@ import CoreData
 
 struct ShoppingListThumbnailView: View {
     
+    @Environment(\.managedObjectContext) private var context
+    
     @StateObject private var viewModel: ShoppingListThumbnailViewModel
 
     var onTapped: () -> Void
 
-    init(shoppingList: ShoppingList, context: NSManagedObjectContext, onTapped: @escaping () -> Void) {
-        _viewModel = StateObject(wrappedValue: ShoppingListThumbnailViewModel(shoppingList: shoppingList, context: context))
+    init(shoppingList: ShoppingList, onTapped: @escaping () -> Void) {
+        _viewModel = StateObject(wrappedValue: ShoppingListThumbnailViewModel(shoppingList: shoppingList))
         self.onTapped = onTapped
     }
 
@@ -39,6 +41,9 @@ struct ShoppingListThumbnailView: View {
             }
         }
         .frame(minHeight: 60)
+        .onAppear {
+            viewModel.update()
+        }
     }
     
 }

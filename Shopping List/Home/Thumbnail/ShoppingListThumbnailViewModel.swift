@@ -11,26 +11,15 @@ import CoreData
 class ShoppingListThumbnailViewModel: ObservableObject {
     
     @Published var shoppingList: ShoppingList
-    @Published var items: [ShoppingItem] = []
+    @Published var count: Int = 0
 
-    init(shoppingList: ShoppingList, context: NSManagedObjectContext) {
+    init(shoppingList: ShoppingList) {
         self.shoppingList = shoppingList
-        self.fetchItems(context: context)
+        self.update()
     }
-
-    private func fetchItems(context: NSManagedObjectContext) {
-        let request: NSFetchRequest<ShoppingItem> = ShoppingItem.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)]
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "list == %@", shoppingList),
-            NSPredicate(format: "basketDate == nil")
-        ])
-        
-        do {
-            self.items = try context.fetch(request)
-        } catch {
-            print("Failed to fetch items: \(error)")
-        }
+    
+    func update() {
+        self.count = (shoppingList.items?.allObjects as? [ShoppingItem] ?? []).filter({$0.basketDate == nil}).count
     }
 
     var title: String {
@@ -41,8 +30,8 @@ class ShoppingListThumbnailViewModel: ObservableObject {
     var subtitle: String {
         if let shoppers = shoppingList.shoppers?.allObjects as? [Shopper] {
             var results: [String] = []
-            if !items.isEmpty {
-                results.append("\(items.count) item\(items.count == 1 ? "" : "s")")
+            if count > 0 {
+                results.append("\(count) item\(count == 1 ? "" : "s")")
             }
             if shoppers.count > 1 {
                 results.append("\(shoppers.count) people")
