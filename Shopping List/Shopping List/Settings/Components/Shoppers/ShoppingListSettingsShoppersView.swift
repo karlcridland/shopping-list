@@ -48,6 +48,7 @@ struct ShoppingListSettingsShoppersView: View {
                 .fontWeight(.regular)
                 .multilineTextAlignment(.leading)
         }.onAppear {
+            print("did appear")
             viewModel.fetchShoppers()
         }
     }

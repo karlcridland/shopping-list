@@ -15,21 +15,33 @@ struct ShoppingListItemsView: View {
 
     var onEdit: (ShoppingItem) -> Void
 
+    @FetchRequest private var items: FetchedResults<ShoppingItem>
+
     init(shoppingList: ShoppingList, onEdit: @escaping (ShoppingItem) -> Void) {
         self.shoppingList = shoppingList
         self.onEdit = onEdit
         _viewModel = StateObject(wrappedValue: ShoppingListItemsViewModel(context: shoppingList.managedObjectContext!, shoppingList: shoppingList))
+
+        _items = FetchRequest(
+            sortDescriptors: [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)],
+            predicate: NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "list == %@", shoppingList),
+                NSPredicate(format: "basketDate == nil")
+            ])
+        )
     }
 
     var body: some View {
-        let categories = viewModel.categories()
+        let groupedItems = Dictionary(grouping: items, by: { $0.category })
+        let categories = groupedItems.keys.sorted()
+
         ZStack {
-            if viewModel.items.isEmpty {
+            if items.isEmpty {
                 NoItemsDefault()
             } else {
                 List {
                     ForEach(categories, id: \.self) { category in
-                        let filteredItems = viewModel.items(for: category)
+                        let filteredItems = groupedItems[category] ?? []
                         ShoppingCategorySection(
                             category: category,
                             items: filteredItems,
@@ -42,11 +54,7 @@ struct ShoppingListItemsView: View {
                 }
             }
         }
-        .onAppear{
-            viewModel.fetchItems()
-        }
     }
-
 }
 
 struct ShoppingCategorySection: View {

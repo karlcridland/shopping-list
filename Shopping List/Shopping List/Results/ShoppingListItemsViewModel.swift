@@ -8,21 +8,24 @@
 import Foundation
 import CoreData
 import SwiftUI
+import Combine
 
 class ShoppingListItemsViewModel: ObservableObject {
     @Published var items: [ShoppingItem] = []
     @Published var previewItem: ShoppingItem?
     @Published var showPreview = false
-
+    
     private var context: NSManagedObjectContext
     private var shoppingList: ShoppingList
-
+    private var cancellables = Set<AnyCancellable>()
+    
     init(context: NSManagedObjectContext, shoppingList: ShoppingList) {
         self.context = context
         self.shoppingList = shoppingList
         fetchItems()
+        observeChanges()
     }
-
+    
     func fetchItems() {
         let request: NSFetchRequest<ShoppingItem> = ShoppingItem.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)]
@@ -36,7 +39,15 @@ class ShoppingListItemsViewModel: ObservableObject {
             print("Failed to fetch shopping items: \(error)")
         }
     }
-
+    
+    private func observeChanges() {
+        NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange, object: context)
+            .sink { [weak self] _ in
+                self?.fetchItems()
+            }
+            .store(in: &cancellables)
+    }
+    
     func deleteItem(_ item: ShoppingItem) {
         item.list = nil
         save()
@@ -70,4 +81,5 @@ class ShoppingListItemsViewModel: ObservableObject {
     func items(for category: Category) -> [ShoppingItem] {
         items.filter { $0.category == category }
     }
+    
 }

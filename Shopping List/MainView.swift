@@ -52,23 +52,23 @@ struct MainView: View {
             }
             .tag(1)
 
-            NavigationStack {
-                StatisticsView()
-                    .navigationTitle("Statistics")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            NotificationButton(model: notificationModel)
-                        }
-                    }
-                    .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
-                        NotificationView()
-                    }
-            }
-            .tabItem {
-                Label("Stats", systemImage: "chart.pie")
-            }
-            .tag(2)
+//            NavigationStack {
+//                StatisticsView()
+//                    .navigationTitle("Statistics")
+//                    .navigationBarTitleDisplayMode(.inline)
+//                    .toolbar {
+//                        ToolbarItem(placement: .topBarTrailing) {
+//                            NotificationButton(model: notificationModel)
+//                        }
+//                    }
+//                    .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
+//                        NotificationView()
+//                    }
+//            }
+//            .tabItem {
+//                Label("Stats", systemImage: "chart.pie")
+//            }
+//            .tag(2)
 
             NavigationStack {
                 SettingsView(signOut: viewModel.signOut, deleteAccount: viewModel.deleteAccount)
@@ -88,3 +88,4 @@ struct MainView: View {
         }
     }
 }
+

@@ -49,7 +49,6 @@ class ShoppingListSettingsViewModel: ObservableObject {
     }
     
     func addShopper(_ uid: String, _ context: NSManagedObjectContext) {
-        self.shoppingList.setUniqueShoppers()
         if var shoppers = self.shoppingList.shopperData as? [String], !shoppers.contains(uid) {
             shoppers.append(uid)
             self.shoppingList.shopperData = shoppers as NSObject

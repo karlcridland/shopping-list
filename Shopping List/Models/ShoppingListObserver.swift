@@ -29,10 +29,13 @@ final class ShoppingListObserver: ObservableObject {
         self.listeners = Database.shopping.getListeners { (id, snapshot, error) in
             self.listeningFor.append(id)
             self.handle(snapshot: snapshot, error: error, context: context) {
-                self.listeningFor.removeAll(where: {$0 == id})
-                self.hasSynced = self.listeningFor.isEmpty
-                if (self.hasSynced) {
-                    onFinish()
+                self.listeningFor.removeAll(where: { $0 == id })
+                let isFinished = self.listeningFor.isEmpty
+                DispatchQueue.main.async {
+                    self.hasSynced = isFinished
+                    if isFinished {
+                        onFinish()
+                    }
                 }
             }
         }
@@ -55,14 +58,8 @@ final class ShoppingListObserver: ObservableObject {
                         self.hasUpdated.append(doc.documentID)
                     }
                 }
-                do {
-                    print("4. saving after observed update")
-                    try context.save()
-                    onFinish()
-                } catch {
-                    print("Failed to download lists: \(error.localizedDescription)")
-                }
             }
+            onFinish()
         }
     }
     
@@ -95,23 +92,15 @@ final class ShoppingListObserver: ObservableObject {
 
 extension ShoppingList {
     
-    func setUniqueShoppers() {
-        if let data = self.shopperData as? [String] {
-            let uniqueData = Array(Set(data))
-            self.shopperData = NSSet(array: uniqueData)
-        }
-    }
-    
     func extract(from doc: QueryDocumentSnapshot, context: NSManagedObjectContext) {
         self.title = doc.get("title") as? String
         self.owner = doc.get("owner") as? String
         self.created = (doc.get("created") as? Timestamp)?.dateValue()
         self.lastUpdated = (doc.get("lastUpdated") as? Timestamp)?.dateValue()
-        self.shopperData = (doc.get("shoppers") as? [String] ?? []) as NSObject
-        self.setUniqueShoppers()
+        self.shopperData = NSArray(array: doc.get("shoppers") as? [String] ?? [])
         
-        if let data = self.shopperData as? [String] {
-            print(data)
+        if let shopperData = self.shopperData as? [String] {
+            print(shopperData)
         }
         
         var shoppingItems: [ShoppingItem] = []
@@ -136,7 +125,11 @@ extension ShoppingList {
                 var shopperList: [Shopper] = []
 
                 for id in shoppers {
-                    if let shopper = await Database.users.shoppers.get(id, context) {
+                    if let originals = self.shoppers?.allObjects as? [Shopper],
+                       let shopper = originals.first(where: {$0.uid == id}) {
+                        shopperList.append(shopper)
+                    }
+                    else if let shopper = await Database.users.shoppers.get(id, context) {
                         shopperList.append(shopper)
                     }
                 }
@@ -168,8 +161,7 @@ extension ShoppingList {
         }
         if let date = timestamp?.dateValue(),
            let original = self.lastUpdated {
-            print(date, original)
-            return date > original
+            return date >= original
         }
         return true
     }

@@ -13,12 +13,25 @@ struct ShoppingListThumbnailView: View {
     @Environment(\.managedObjectContext) private var context
     
     @StateObject private var viewModel: ShoppingListThumbnailViewModel
+    @FetchRequest private var items: FetchedResults<ShoppingItem>
+    @FetchRequest private var shoppers: FetchedResults<Shopper>
 
     var onTapped: () -> Void
 
     init(shoppingList: ShoppingList, onTapped: @escaping () -> Void) {
         _viewModel = StateObject(wrappedValue: ShoppingListThumbnailViewModel(shoppingList: shoppingList))
         self.onTapped = onTapped
+        _items = FetchRequest(
+            sortDescriptors: [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)],
+            predicate: NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "list == %@", shoppingList),
+                NSPredicate(format: "basketDate == nil")
+            ])
+        )
+        _shoppers = FetchRequest(
+            sortDescriptors: [NSSortDescriptor(keyPath: \Shopper.uid, ascending: true)],
+            predicate: NSPredicate(format: "ANY lists == %@", shoppingList)
+        )
     }
 
     var body: some View {
@@ -30,7 +43,7 @@ struct ShoppingListThumbnailView: View {
                     Text(viewModel.title)
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(Color(.charcoal))
-                    Text(viewModel.subtitle)
+                    Text(viewModel.getSubtitle(items, shoppers))
                         .font(.caption)
                         .foregroundColor(Color(.charcoal).opacity(0.8))
                 }
@@ -41,9 +54,6 @@ struct ShoppingListThumbnailView: View {
             }
         }
         .frame(minHeight: 60)
-        .onAppear {
-            viewModel.update()
-        }
     }
     
 }

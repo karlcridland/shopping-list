@@ -18,7 +18,6 @@ struct ShoppingListSettingsView: View {
     init(shoppingList: ShoppingList, focusTitleEdit: FocusState<Bool>.Binding) {
         _viewModel = StateObject(wrappedValue: ShoppingListSettingsViewModel(shoppingList: shoppingList))
         _focusTitleEdit = focusTitleEdit
-        shoppingList.setUniqueShoppers()
     }
     
     var body: some View {
@@ -41,7 +40,7 @@ struct ShoppingListSettingsView: View {
             
             
         }
-        .sheet(isPresented: $viewModel.showShoppingList) {
+        .navigationDestination(isPresented: $viewModel.showShoppingList) {
             if let shoppers = viewModel.shoppingList.shopperData as? [String] {
                 ShoppingListShoppersView(shoppers, context) { uid in
                     self.viewModel.addShopper(uid, context)

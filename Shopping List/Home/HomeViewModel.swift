@@ -42,7 +42,7 @@ class HomeViewModel: ObservableObject {
         list.created = Date()
         list.lastUpdated = Date()
         list.owner = uid
-        list.shopperData = NSSet(array: [])
+        list.shopperData = NSArray(array: [])
         list.save()
 
         fetchLists()

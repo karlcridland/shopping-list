@@ -14,14 +14,13 @@ class ShoppingListSettingsShoppersViewModel: ObservableObject {
     
     init(shoppingList: ShoppingList) {
         self.shoppingList = shoppingList
-        self.shoppers = shoppingList.shoppers as? [Shopper] ?? []
+        self.shoppers = shoppingList.shoppers?.allObjects as? [Shopper] ?? []
     }
     
     func removeUser(_ uid: String?, _ context: NSManagedObjectContext) {
         if var shoppers = self.shoppingList.shopperData as? [String] {
-            self.shoppingList.setUniqueShoppers()
             shoppers.removeAll(where: {$0 == uid})
-            self.shoppingList.shopperData = NSSet(array: shoppers)
+            self.shoppingList.shopperData = NSArray(array: shoppers)
             self.shoppers.removeAll(where: {$0.uid == uid})
             self.shoppingList.save()
             try? context.save()
@@ -29,7 +28,7 @@ class ShoppingListSettingsShoppersViewModel: ObservableObject {
     }
     
     func fetchShoppers() {
-        self.shoppers = shoppingList.shoppers as? [Shopper] ?? []
+        self.shoppers = shoppingList.shoppers?.allObjects as? [Shopper] ?? []
     }
     
 }

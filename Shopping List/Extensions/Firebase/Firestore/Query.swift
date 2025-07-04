@@ -33,7 +33,7 @@ extension Query {
                     shoppingList.lastUpdated = (doc.get("lastUpdated") as? Timestamp)?.dateValue()
 
                     if let shopperIDs = doc.get("shoppers") as? [String] {
-                        shoppingList.shopperData = shopperIDs as NSObject
+                        shoppingList.shopperData = NSArray(array: shopperIDs)
                         var relatedShoppers: [Shopper] = []
                         for uid in shopperIDs {
                             if let shopper = await Database.users.shoppers.get(uid, context) {

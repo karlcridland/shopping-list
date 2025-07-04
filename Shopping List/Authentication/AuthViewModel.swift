@@ -70,7 +70,7 @@ class AuthViewModel: NSObject, ObservableObject, ASAuthorizationControllerDelega
                     print("Sign in failed: \(error.localizedDescription)")
                 }
                 if (result?.user.displayName == nil) {
-                    if let givenName = appleIDCredential.fullName?.familyName,
+                    if let givenName = appleIDCredential.fullName?.givenName,
                         let familyName = appleIDCredential.fullName?.familyName {
                         let name = Name(givenName, familyName)
                         Database.users.shoppers.set(name: name)
