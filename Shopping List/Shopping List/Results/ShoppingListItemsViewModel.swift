@@ -49,7 +49,7 @@ class ShoppingListItemsViewModel: ObservableObject {
     }
     
     func deleteItem(_ item: ShoppingItem) {
-        item.list = nil
+        shoppingList.remove(item)
         save()
     }
 

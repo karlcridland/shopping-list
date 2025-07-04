@@ -10,17 +10,17 @@ import SwiftUI
 struct ProfileImageView: View {
     
     @StateObject private var viewModel = ProfileImageViewModel()
-    let uid: String
+    let uid: String?
     let height, width, padding: CGFloat
     
-    init(uid: String, height: CGFloat, width: CGFloat, padding: CGFloat) {
+    init(uid: String?, height: CGFloat, width: CGFloat, padding: CGFloat) {
         self.uid = uid
         self.height = height
         self.width = width
         self.padding = padding
     }
     
-    init(uid: String, size: CGFloat, padding: CGFloat) {
+    init(uid: String?, size: CGFloat, padding: CGFloat) {
         self.uid = uid
         self.height = size
         self.width = size
@@ -48,7 +48,9 @@ struct ProfileImageView: View {
             }
         }
         .onAppear {
-            viewModel.loadImage(for: uid)
+            if let uid = uid {
+                viewModel.loadImage(for: uid)
+            }
         }
     }
 }

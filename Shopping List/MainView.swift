@@ -71,7 +71,7 @@ struct MainView: View {
 //            .tag(2)
 
             NavigationStack {
-                SettingsView(signOut: viewModel.signOut, deleteAccount: viewModel.deleteAccount)
+                SettingsView(signOut: viewModel.signOut)
                     .navigationTitle("Settings")
                     .navigationBarTitleDisplayMode(.inline)
                     .navigationDestination(isPresented: $notificationModel.showNotificationSheet) {
