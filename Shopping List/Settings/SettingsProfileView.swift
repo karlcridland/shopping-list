@@ -15,6 +15,7 @@ struct SettingsProfileView: View {
     
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedImage: UIImage? = nil
+    @State private var isUploadgin: Bool = false
 
     init(_ context: NSManagedObjectContext, _ showProfilePicture: Binding<Bool>) {
         _viewModel = StateObject(wrappedValue: SettingsProfileViewModel(context))
@@ -28,7 +29,7 @@ struct SettingsProfileView: View {
                 VStack(alignment: .center, spacing: 20) {
                     PhotosPicker(selection: $selectedItem, matching: .images) {
                         VStack(alignment: .center, spacing: 5) {
-                            ProfileImageView(uid: viewModel.uid, size: 50, padding: 0)
+                            ProfileImageView(uid: viewModel.uid, size: 60, image: $selectedImage)
                             Text("tap to upload")
                                 .font(.caption2)
                                 .fontWeight(.medium)
@@ -47,11 +48,9 @@ struct SettingsProfileView: View {
             .padding(.vertical, 16)
         }
         .onChange(of: selectedItem) { _, newItem in
-            guard let item = newItem else { return }
-            Task {
-                if let data = try? await item.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    selectedImage = image
+            viewModel.extractImage(newItem) { image in
+                if let image = image {
+                    self.selectedImage = image
                 }
             }
         }

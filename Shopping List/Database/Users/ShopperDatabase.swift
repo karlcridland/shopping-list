@@ -25,10 +25,14 @@ class ShopperDatabase: BaseDatabase {
         if let uid = uid {
             do {
                 let snapshot = try await db.document("users/\(uid)").getDocument()
-                let shopper = snapshot.shopper(from: context)
-                if let shopper = shopper, !shopper.isFault {
-                    return shopper
+                return await context.perform {
+                    let shopper = snapshot.shopper(from: context)
+                    if let shopper = shopper, !shopper.isFault {
+                        return shopper
+                    }
+                    return nil
                 }
+
             } catch {
                 print("Error getting shopper: \(error.localizedDescription)")
                 return nil

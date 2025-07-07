@@ -41,7 +41,7 @@ extension Query {
                             }
                         }
                         await context.perform {
-                            shoppingList.shoppers = NSSet(array: relatedShoppers)
+                            shoppingList.shoppers = NSSet(safeArray: relatedShoppers)
                         }
                     }
                 }

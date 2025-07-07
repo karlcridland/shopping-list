@@ -12,24 +12,27 @@ struct ProfileImageView: View {
     @StateObject private var viewModel = ProfileImageViewModel()
     let uid: String?
     let height, width, padding: CGFloat
+    @Binding var image: UIImage?
     
-    init(uid: String?, height: CGFloat, width: CGFloat, padding: CGFloat) {
+    init(uid: String?, height: CGFloat, width: CGFloat, padding: CGFloat = 0, image: Binding<UIImage?>) {
         self.uid = uid
         self.height = height
         self.width = width
         self.padding = padding
+        _image = image
     }
     
-    init(uid: String?, size: CGFloat, padding: CGFloat) {
+    init(uid: String?, size: CGFloat, padding: CGFloat = 0, image: Binding<UIImage?>) {
         self.uid = uid
         self.height = size
         self.width = size
         self.padding = padding
+        _image = image
     }
     
     var body: some View {
         Group {
-            if let image = viewModel.image {
+            if let image = image {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -48,8 +51,10 @@ struct ProfileImageView: View {
             }
         }
         .onAppear {
-            if let uid = uid {
-                viewModel.loadImage(for: uid)
+            if let uid = uid, image == nil{
+                viewModel.loadImage(for: uid) { image in
+                    self.image = image
+                }
             }
         }
     }

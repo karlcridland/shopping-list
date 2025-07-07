@@ -10,6 +10,7 @@ import SwiftUI
 struct ShopperButton: View {
 
     @StateObject private var viewModel: ShopperButtonViewModel
+    @State var image: UIImage?
     
     private let buttonSize: CGFloat = 32
     private let padding: CGFloat = 8
@@ -26,7 +27,7 @@ struct ShopperButton: View {
         HStack(spacing: 10) {
             let size: CGFloat = buttonSize + (2 * pictureVariance)
             let padding: CGFloat = padding - pictureVariance
-            ProfileImageView(uid: viewModel.shopper.uid ?? "", size: size, padding: padding)
+            ProfileImageView(uid: viewModel.shopper.uid ?? "", size: size, padding: padding, image: $image)
             VStack(alignment: .leading) {
                 Text(viewModel.shopper.name.full)
                     .font(.title3)

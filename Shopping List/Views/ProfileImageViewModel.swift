@@ -10,12 +10,11 @@ import FirebaseStorage
 import SwiftUI
 
 class ProfileImageViewModel: ObservableObject {
-    @Published var image: UIImage?
 
     private var storage = Storage.storage()
 
-    func loadImage(for uid: String) {
-        let path = "profile_pictures/\(uid).jpg"
+    func loadImage(for uid: String, onComplete: @escaping (UIImage) -> Void) {
+        let path = "users/\(uid)/profile.jpg"
         let ref = storage.reference(withPath: path)
 
         ref.downloadURL { url, error in
@@ -27,7 +26,7 @@ class ProfileImageViewModel: ObservableObject {
             URLSession.shared.dataTask(with: url) { data, _, error in
                 if let data = data, let uiImage = UIImage(data: data) {
                     DispatchQueue.main.async {
-                        self.image = uiImage
+                        onComplete(uiImage)
                     }
                 }
             }.resume()

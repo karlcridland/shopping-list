@@ -99,10 +99,6 @@ extension ShoppingList {
         self.lastUpdated = (doc.get("lastUpdated") as? Timestamp)?.dateValue()
         self.shopperData = NSArray(array: doc.get("shoppers") as? [String] ?? [])
         
-        if let shopperData = self.shopperData as? [String] {
-            print(shopperData)
-        }
-        
         var shoppingItems: [ShoppingItem] = []
         if let itemsData = doc.get("items") as? [[String: Any]] {
             itemsData.forEach { itemData in
@@ -117,7 +113,7 @@ extension ShoppingList {
                 }
             }
         }
-        self.items = NSSet(array: shoppingItems)
+        self.items = NSSet(safeArray: shoppingItems)
         
         Task {
             self.ownerShopper = await Database.users.shoppers.get(self.owner ?? "", context)
@@ -135,7 +131,7 @@ extension ShoppingList {
                 }
 
                 await context.perform {
-                    self.shoppers = NSSet(array: shopperList)
+                    self.shoppers = NSSet(safeArray: shopperList)
                 }
             }
         }
@@ -166,4 +162,14 @@ extension ShoppingList {
         return true
     }
     
+}
+
+extension NSSet {
+    convenience init?(safeArray array: [Any?]) {
+        let cleaned = array.compactMap { $0 }
+        guard cleaned.count == array.count else {
+            return nil
+        }
+        self.init(array: cleaned)
+    }
 }
