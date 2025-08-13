@@ -22,23 +22,19 @@ class ShopperDatabase: BaseDatabase {
     }
     
     func get(_ uid: String?, _ context: NSManagedObjectContext) async -> Shopper? {
-        if let uid = uid {
-            do {
-                let snapshot = try await db.document("users/\(uid)").getDocument()
-                return await context.perform {
-                    let shopper = snapshot.shopper(from: context)
-                    if let shopper = shopper, !shopper.isFault {
-                        return shopper
-                    }
-                    return nil
-                }
+        guard let uid = uid else { return nil }
 
-            } catch {
-                print("Error getting shopper: \(error.localizedDescription)")
-                return nil
+        do {
+            let snapshot = try await db.document("users/\(uid)").getDocument()
+            return await context.perform {
+                let shopper = snapshot.shopper(from: context)
+                return shopper
             }
+
+        } catch {
+            print("Error getting shopper: \(error.localizedDescription)")
+            return nil
         }
-        return nil
     }
     
     func search(query: String, context: NSManagedObjectContext) async -> [Shopper] {
@@ -57,3 +53,4 @@ class ShopperDatabase: BaseDatabase {
     }
     
 }
+// 

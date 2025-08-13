@@ -12,6 +12,7 @@ struct SearchView: View {
     
     @ObservedObject private var viewModel: SearchViewModel
     @FocusState private var isFocused: Bool
+    @State private var selectedShopper: Shopper?
     
     init(context: NSManagedObjectContext) {
         self.viewModel = SearchViewModel(context)
@@ -39,24 +40,34 @@ struct SearchView: View {
             if viewModel.results.isEmpty {
                 NoSearchResultsDefault(query: $viewModel.searchedString, isLoading: $viewModel.isLoading)
             } else {
-                ResultsView(results: viewModel.results, showDuplicateRequestAlert: $viewModel.showDuplicateRequestAlert)
+                ResultsView(
+                    results: viewModel.results,
+                    showDuplicateRequestAlert: $viewModel.showDuplicateRequestAlert,
+                    onSelect: { shopper in
+                        viewModel.selectedShopper = shopper
+                        print("shopper selected")
+                    })
             }
 
             Spacer(minLength: 0)
         }
         .background(Color(.systemGroupedBackground))
+        .navigationDestination(item: $viewModel.selectedShopper) { shopper in
+            ProfileView(shopper: shopper)
+        }
     }
     
     struct ResultsView: View {
         
         @State var results: [Shopper]
         @Binding var showDuplicateRequestAlert: Bool
+        var onSelect: (Shopper) -> Void
         
         var body: some View {
             List(results, id: \.uid) { shopper in
                 ShopperButton(shopper: shopper, onAlert: { message in
                     showDuplicateRequestAlert = true
-                })
+                }, onSelect: onSelect)
             }
             .contentMargins(12)
             .listStyle(.insetGrouped)
@@ -75,4 +86,15 @@ struct SearchView: View {
         }
         
     }
+}
+
+struct ProfileView: View {
+    
+//    @ObservedObject var viewModel: ProfileViewModel
+    @State var shopper: Shopper
+    
+    var body: some View {
+        Text(shopper.name.full)
+    }
+    
 }

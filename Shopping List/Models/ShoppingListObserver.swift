@@ -28,7 +28,7 @@ final class ShoppingListObserver: ObservableObject {
 
         self.listeners = Database.shopping.getListeners { (id, snapshot, error) in
             self.listeningFor.append(id)
-            self.handle(snapshot: snapshot, error: error, context: context) {
+            self.handle(snapshot: snapshot, error: error) {
                 self.listeningFor.removeAll(where: { $0 == id })
                 let isFinished = self.listeningFor.isEmpty
                 DispatchQueue.main.async {
@@ -41,19 +41,20 @@ final class ShoppingListObserver: ObservableObject {
         }
     }
 
-    private func handle(snapshot: QuerySnapshot?, error: Error?, context: NSManagedObjectContext, onFinish: @escaping () -> Void) {
+    private func handle(snapshot: QuerySnapshot?, error: Error?, onFinish: @escaping () -> Void) {
+        let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
         guard let documents = snapshot?.documents else {
             print("Error syncing shopping lists: \(error?.localizedDescription ?? "Unknown error")")
             return
         }
 
         Task {
-            await context.perform {
+            await backgroundContext.perform {
                 for doc in documents {
                     if (!self.deleteList.contains(doc.documentID)) {
-                        let list = self.fetchOrCreateList(id: doc.documentID, context: context)
+                        let list = self.fetchOrCreateList(id: doc.documentID, context: backgroundContext)
                         if list.shouldUpdate(from: (doc.get("lastUpdated") as? Timestamp), firstUpdate: !self.hasUpdated.contains(doc.documentID)) {
-                            list.extract(from: doc, context: context)
+                            list.extract(from: doc, context: backgroundContext)
                         }
                         self.hasUpdated.append(doc.documentID)
                     }
@@ -114,12 +115,15 @@ extension ShoppingList {
             }
         }
         self.items = NSSet(safeArray: shoppingItems)
-        
         Task {
-            self.ownerShopper = await Database.users.shoppers.get(self.owner ?? "", context)
+        if let shopper = await Database.users.shoppers.get(self.owner ?? "", context) {
+            await context.perform {
+                self.ownerShopper = shopper
+            }
+        }
             if let shoppers = self.shopperData as? [String] {
                 var shopperList: [Shopper] = []
-
+                
                 for id in shoppers {
                     if let originals = self.shoppers?.allObjects as? [Shopper],
                        let shopper = originals.first(where: {$0.uid == id}) {
@@ -129,7 +133,7 @@ extension ShoppingList {
                         shopperList.append(shopper)
                     }
                 }
-
+                
                 await context.perform {
                     self.shoppers = NSSet(safeArray: shopperList)
                 }

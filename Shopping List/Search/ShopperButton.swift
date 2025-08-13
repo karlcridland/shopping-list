@@ -17,51 +17,58 @@ struct ShopperButton: View {
     private let pictureVariance: CGFloat = 3
 
     var onAlert: (String) -> Void
+    var onSelect: (Shopper) -> Void
 
-    init(shopper: Shopper, onAlert: @escaping (String) -> Void) {
+    init(shopper: Shopper, onAlert: @escaping (String) -> Void, onSelect: @escaping (Shopper) -> Void) {
         _viewModel = StateObject(wrappedValue: ShopperButtonViewModel(shopper))
         self.onAlert = onAlert
+        self.onSelect = onSelect
     }
 
     var body: some View {
-        HStack(spacing: 10) {
-            let size: CGFloat = buttonSize + (2 * pictureVariance)
-            let padding: CGFloat = padding - pictureVariance
-            ProfileImageView(uid: viewModel.shopper.uid ?? "", size: size, padding: padding, image: $image)
-            VStack(alignment: .leading) {
-                Text(viewModel.shopper.name.full)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                Text(viewModel.subtitle)
-                    .font(.system(size: 14, weight: .medium))
-                    .italic()
-                    .foregroundStyle(.charcoal.opacity(0.6))
-                    .multilineTextAlignment(.leading)
-            }
-
-            Spacer()
-
-            if viewModel.status == .requestReceived {
-                FriendRequestButtons(onAccept: viewModel.accept, onReject: viewModel.reject)
-            }
-            else if !(viewModel.shopper.uid?.isMyUid ?? false) && viewModel.status == nil && viewModel.hasLoaded {
-                Button {
-                    if let uid = viewModel.shopper.uid {
-                        viewModel.quickAdd(uid, onAlert: onAlert)
+        Button {
+            onSelect(viewModel.shopper)
+        } label: {
+            HStack(spacing: 10) {
+                let size: CGFloat = buttonSize + (2 * pictureVariance)
+                let padding: CGFloat = padding - pictureVariance
+                ProfileImageView(uid: viewModel.shopper.uid ?? "", size: size, padding: padding, image: $image)
+                VStack(alignment: .leading) {
+                    Text(viewModel.shopper.name.full)
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                    Text(viewModel.subtitle)
+                        .font(.system(size: 14, weight: .medium))
+                        .italic()
+                        .foregroundStyle(.charcoal.opacity(0.6))
+                        .multilineTextAlignment(.leading)
+                }
+                
+                Spacer()
+                
+                if viewModel.status == .requestReceived {
+                    FriendRequestButtons(onAccept: viewModel.accept, onReject: viewModel.reject)
+                }
+                else if !(viewModel.shopper.uid?.isMyUid ?? false) && viewModel.status == nil && viewModel.hasLoaded {
+                    Button {
+                        if let uid = viewModel.shopper.uid {
+                            viewModel.quickAdd(uid, onAlert: onAlert)
+                        }
+                    } label: {
+                        Image(systemName: "person.crop.circle.fill.badge.plus")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(Color(.systemBlue))
+                            .frame(width: buttonSize, height: buttonSize)
+                            .padding(padding)
                     }
-                } label: {
-                    Image(systemName: "person.crop.circle.fill.badge.plus")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(Color(.systemBlue))
-                        .frame(width: buttonSize, height: buttonSize)
-                        .padding(padding)
                 }
             }
-        }
-        .frame(minHeight: buttonSize + (2 * padding))
-        .task {
-            await viewModel.getSubtitle()
+            .frame(minHeight: buttonSize + (2 * padding))
+            .task {
+                await viewModel.getSubtitle()
+            }
         }
     }
     

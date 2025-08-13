@@ -17,8 +17,9 @@ class SearchViewModel: ObservableObject {
     @Published private(set) var results: [Shopper] = []
     @Published var isLoading: Bool = false
     @Published var searchedString: String = ""
-    
     @Published var showDuplicateRequestAlert: Bool = false
+    
+    @State var selectedShopper: Shopper?
 
     private var cancellables = Set<AnyCancellable>()
     private var searchTask: Task<Void, Never>?
@@ -44,3 +45,4 @@ class SearchViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 }
+
