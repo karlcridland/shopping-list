@@ -70,7 +70,6 @@ class HomeViewModel: ObservableObject {
 
             if deleted {
                 do {
-                    print("3. Saving after list deletion")
                     try context.save()
                     fetchLists()
                 } catch {
@@ -79,5 +78,13 @@ class HomeViewModel: ObservableObject {
             }
         }
     }
+    
+    func positionInList(_ shoppingList: ShoppingList) -> Int {
+        (self.shoppingLists.firstIndex(where: { $0.id == shoppingList.id }) ?? 0) + 1
+    }
 
+    var listSize: Int {
+        self.shoppingLists.count + 1
+    }
+    
 }

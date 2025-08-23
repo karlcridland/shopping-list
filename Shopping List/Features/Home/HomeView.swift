@@ -20,7 +20,7 @@ struct HomeView: View {
     var body: some View {
         List {
             ForEach(viewModel.shoppingLists, id: \.id) { shoppingList in
-                ShoppingListThumbnailView(shoppingList: shoppingList) {
+                ShoppingListThumbnailView(shoppingList: shoppingList, viewModel.positionInList(shoppingList), viewModel.listSize) {
                     viewModel.selectedList = shoppingList
                     viewModel.showShoppingList = true
                 }
@@ -32,7 +32,7 @@ struct HomeView: View {
                 }
             }
             
-            NewShoppingListThumbnail {
+            NewShoppingListThumbnail(viewModel.listSize) {
                 viewModel.createList()
             }
         }

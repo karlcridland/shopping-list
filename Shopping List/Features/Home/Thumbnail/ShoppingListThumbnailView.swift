@@ -18,8 +18,8 @@ struct ShoppingListThumbnailView: View {
 
     var onTapped: () -> Void
 
-    init(shoppingList: ShoppingList, onTapped: @escaping () -> Void) {
-        _viewModel = StateObject(wrappedValue: ShoppingListThumbnailViewModel(shoppingList: shoppingList))
+    init(shoppingList: ShoppingList, _ position: Int, _ total: Int, onTapped: @escaping () -> Void) {
+        _viewModel = StateObject(wrappedValue: ShoppingListThumbnailViewModel(shoppingList: shoppingList, position, total))
         self.onTapped = onTapped
         _items = FetchRequest(
             sortDescriptors: [NSSortDescriptor(keyPath: \ShoppingItem.title, ascending: true)],
@@ -54,6 +54,8 @@ struct ShoppingListThumbnailView: View {
             }
         }
         .frame(minHeight: 60)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(viewModel.description)
     }
     
 }

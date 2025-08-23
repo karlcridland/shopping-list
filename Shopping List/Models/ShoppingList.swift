@@ -88,9 +88,49 @@ extension ShoppingList {
         self.outstanding.stringValue
     }
     
+    var usersString: String? {
+        if let shoppers = self.shoppers?.allObjects as? [Shopper], !shoppers.isEmpty {
+            let names = shoppers.map({$0.name.givenName}).formattedSummary()
+            return "shared with \(names)"
+        }
+        return nil
+    }
+    
     public static func == (lhs: ShoppingList, rhs: ShoppingList) -> Bool {
         lhs.id == rhs.id
     }
     
 }
 
+extension [String] {
+    
+    func formattedList() -> String {
+        switch self.count {
+        case 0:
+            return ""
+        case 1:
+            return self[0]
+        case 2:
+            return "\(self[0]) and \(self[1])"
+        default:
+            let allButLast = self.dropLast().joined(separator: ", ")
+            return "\(allButLast), and \(self.last!)"
+        }
+    }
+    
+    func formattedSummary() -> String {
+        switch self.count {
+        case 0:
+            return ""
+        case 1:
+            return self[0]
+        case 2:
+            return "\(self[0]) and \(self[1])"
+        default:
+            let firstTwo = "\(self[0]), \(self[1])"
+            let remaining = self.count - 2
+            return "\(firstTwo), and \(remaining) other" + (remaining > 1 ? "s" : "")
+        }
+    }
+    
+}

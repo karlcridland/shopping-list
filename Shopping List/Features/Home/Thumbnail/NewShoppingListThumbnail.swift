@@ -9,11 +9,17 @@ import SwiftUI
 
 struct NewShoppingListThumbnail: View {
     
-    var onCreate: (() -> Void)?
+    let size: Int
+    var onCreate: () -> Void
+    
+    init(_ size: Int, _ onCreate: @escaping () -> Void) {
+        self.size = size
+        self.onCreate = onCreate
+    }
     
     var body: some View {
         Button {
-            onCreate?()
+            onCreate()
         } label: {
             HStack {
                 VStack (alignment: .leading, spacing: 5, content: {
@@ -31,6 +37,8 @@ struct NewShoppingListThumbnail: View {
             }
         }
         .frame(minHeight: 60)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Create new shopping list, Button, \(size) of \(size)")
     }
     
     var title: String {
