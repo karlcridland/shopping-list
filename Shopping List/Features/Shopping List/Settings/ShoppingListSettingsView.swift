@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ShoppingListSettingsView: View {
     
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var context
     
     @StateObject private var viewModel: ShoppingListSettingsViewModel
@@ -36,7 +37,12 @@ struct ShoppingListSettingsView: View {
             }
             
             ShoppingListSettingsShoppersView(shoppingList: viewModel.shoppingList, showShoppingList: $viewModel.showShoppingList, font: viewModel.font)
-            ShoppingListSettingsDestructiveView(ownedByUser: viewModel.isOwnedByUser, font: viewModel.font)
+            ShoppingListSettingsDestructiveView(ownedByUser: viewModel.isOwnedByUser, font: viewModel.font) {
+                Task {
+                    await viewModel.shoppingList.delete()
+                    self.dismiss()
+                }
+            }
             
             
         }

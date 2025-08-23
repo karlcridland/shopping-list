@@ -11,11 +11,12 @@ struct ShoppingListSettingsDestructiveView: View {
     
     let ownedByUser: Bool
     let font: Font
+    let onDelete: () -> Void
     
     var body: some View {
         Section {
             Button {
-                
+                onDelete()
             } label: {
                 VStack(alignment: .leading) {
                     Text(ownedByUser ? "Delete List" : "Remove yourself from this list")
