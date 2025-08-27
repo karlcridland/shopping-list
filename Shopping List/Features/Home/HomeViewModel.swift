@@ -79,12 +79,16 @@ class HomeViewModel: ObservableObject {
         }
     }
     
-    func positionInList(_ shoppingList: ShoppingList) -> Int {
+    private func positionInList(_ shoppingList: ShoppingList) -> Int {
         (self.shoppingLists.firstIndex(where: { $0.id == shoppingList.id }) ?? 0) + 1
     }
 
     var listSize: Int {
         self.shoppingLists.count + 1
+    }
+    
+    func accessibilityPosition(_ shoppingList: ShoppingList) -> AccessibilityPosition {
+        AccessibilityPosition(position: positionInList(shoppingList), total: listSize)
     }
     
 }

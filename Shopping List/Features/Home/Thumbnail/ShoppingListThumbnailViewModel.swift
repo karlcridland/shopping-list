@@ -12,12 +12,11 @@ class ShoppingListThumbnailViewModel: ObservableObject {
     
     @Published var shoppingList: ShoppingList
     
-    var position, total: Int
+    var position: AccessibilityPosition
 
-    init(shoppingList: ShoppingList, _ position: Int, _ total: Int) {
+    init(shoppingList: ShoppingList, _ position: AccessibilityPosition) {
         self.shoppingList = shoppingList
         self.position = position
-        self.total = total
     }
 
     var title: String {
@@ -48,7 +47,7 @@ class ShoppingListThumbnailViewModel: ObservableObject {
             self.shoppingList.usersString,
             self.itemsString,
             "Button",
-            "\(position) of \(total)."
+            position.label
         ].compactMap({$0}).joined(separator: ", ")
     }
 

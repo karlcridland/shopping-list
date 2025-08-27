@@ -12,12 +12,14 @@ struct ShopperSettingsThumbnailView: View {
     let shopper: Shopper?
     let isOwner: Bool
     let font: Font
+    let position: AccessibilityPosition
     @State var image: UIImage?
     
-    init(_ shopper: Shopper?, _ isOwner: Bool, _ font: Font) {
+    init(_ shopper: Shopper?, _ isOwner: Bool, _ font: Font, _ position: AccessibilityPosition) {
         self.shopper = shopper
         self.isOwner = isOwner
         self.font = font
+        self.position = position
     }
     
     var body: some View {
@@ -32,7 +34,17 @@ struct ShopperSettingsThumbnailView: View {
                     }
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(accessibilityLabel ?? "")
         }
+    }
+    
+    var accessibilityLabel: String? {
+        var results: [String?] = [shopper?.name.full]
+        if (isOwner) {
+            results.append("Owner of list")
+        }
+        return results.compactMap({$0}).joined(separator: ", ")
     }
     
 }

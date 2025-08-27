@@ -25,9 +25,9 @@ struct ShoppingListSettingsShoppersView: View {
     
     var body: some View {
         Section {
-            ShopperSettingsThumbnailView(viewModel.shoppingList.ownerShopper, true, font)
+            ShopperSettingsThumbnailView(viewModel.shoppingList.ownerShopper, true, font, viewModel.shoppingList.accessibilityPosition())
             ForEach(viewModel.shoppers) { shopper in
-                ShopperSettingsThumbnailView(shopper, false, font)
+                ShopperSettingsThumbnailView(shopper, false, font, viewModel.shoppingList.accessibilityPosition(shopper))
                     .swipeActions(allowsFullSwipe: true) {
                         SwipeButton(isDestructive: true, systemImage: "person.crop.circle.badge.minus", label: "Remove") {
                             self.viewModel.removeUser(shopper.uid, context)

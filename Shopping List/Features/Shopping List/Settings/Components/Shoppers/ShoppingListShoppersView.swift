@@ -35,7 +35,7 @@ struct ShoppingListShoppersView: View {
                             }
                         } label: {
                             HStack {
-                                ShopperSettingsThumbnailView(shopper, false, .system(size: 15, weight: .medium))
+                                ShopperSettingsThumbnailView(shopper, false, .system(size: 15, weight: .medium), AccessibilityPosition(position: 0, total: 0))
                                     .foregroundStyle(Color(.label))
                             }
                         }
