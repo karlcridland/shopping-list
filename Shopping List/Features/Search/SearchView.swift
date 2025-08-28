@@ -19,42 +19,47 @@ struct SearchView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer(minLength: 16)
-
-            withAnimation {
-                TextField("e.g. John Appleseed", text: $viewModel.query)
-                    .contentMargins(.trailing, isFocused ? 100 : 0)
-                    .padding(16)
-                    .background(.frost)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 16, weight: .medium))
-                    .focused($isFocused)
-                    .submitLabel(.done)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 10)
-                    .shadow(color: Color(.charcoal).opacity(0.05), radius: 6)
+        NavigationStack {
+            VStack(spacing: 0) {
+                Spacer(minLength: 16)
+                
+                withAnimation {
+                    TextField("e.g. John Appleseed", text: $viewModel.query)
+                        .contentMargins(.trailing, isFocused ? 100 : 0)
+                        .padding(16)
+                        .background(.frost)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 16, weight: .medium))
+                        .focused($isFocused)
+                        .submitLabel(.done)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 10)
+                        .shadow(color: Color(.charcoal).opacity(0.05), radius: 6)
+                }
+                
+                if viewModel.results.isEmpty {
+                    NoSearchResultsDefault(query: $viewModel.searchedString, isLoading: $viewModel.isLoading)
+                } else {
+                    ResultsView(
+                        results: viewModel.results,
+                        showDuplicateRequestAlert: $viewModel.showDuplicateRequestAlert,
+                        onSelect: { shopper in
+                            Task {
+                                viewModel.selectedShopper = shopper
+                                viewModel.refreshID = UUID().uuidString
+                            }
+                        })
+                }
+                
+                Spacer(minLength: 0)
             }
-
-            if viewModel.results.isEmpty {
-                NoSearchResultsDefault(query: $viewModel.searchedString, isLoading: $viewModel.isLoading)
-            } else {
-                ResultsView(
-                    results: viewModel.results,
-                    showDuplicateRequestAlert: $viewModel.showDuplicateRequestAlert,
-                    onSelect: { shopper in
-                        viewModel.selectedShopper = shopper
-                        print("shopper selected")
-                    })
+            .background(Color(.systemGroupedBackground))
+            .navigationDestination(item: $viewModel.selectedShopper) { shopper in
+                ProfileView(shopper: shopper)
             }
-
-            Spacer(minLength: 0)
         }
-        .background(Color(.systemGroupedBackground))
-        .navigationDestination(item: $viewModel.selectedShopper) { shopper in
-            ProfileView(shopper: shopper)
-        }
+        .id(viewModel.refreshID)
     }
     
     struct ResultsView: View {
@@ -92,6 +97,11 @@ struct ProfileView: View {
     
 //    @ObservedObject var viewModel: ProfileViewModel
     @State var shopper: Shopper
+    
+    init(shopper: Shopper) {
+        self.shopper = shopper
+        print("testing 123")
+    }
     
     var body: some View {
         Text(shopper.name.full)

@@ -14,6 +14,7 @@ class ShopperButtonViewModel: ObservableObject {
     @Published var subtitle: String = ""
     @Published var status: FriendStatus?
     @Published var hasLoaded: Bool = false
+    
     let shopper: Shopper
     
     init(_ shopper: Shopper) {

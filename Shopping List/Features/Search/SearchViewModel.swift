@@ -18,6 +18,7 @@ class SearchViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var searchedString: String = ""
     @Published var showDuplicateRequestAlert: Bool = false
+    @Published var refreshID: String = UUID().uuidString
     
     @State var selectedShopper: Shopper?
 
