@@ -91,14 +91,3 @@ struct SearchView: View {
         
     }
 }
-
-struct ProfileView: View {
-    
-//    @ObservedObject var viewModel: ProfileViewModel
-    @State var shopper: Shopper
-    
-    var body: some View {
-        Text(shopper.name.full)
-    }
-    
-}
