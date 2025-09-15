@@ -6,14 +6,29 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ProfileView: View {
     
-//    @ObservedObject var viewModel: ProfileViewModel
-    @State var shopper: Shopper
+    @ObservedObject var viewModel: ProfileViewModel
     
-    var body: some View {
-        Text(shopper.name.full)
+    init(shopper: Shopper) {
+        self.viewModel = ProfileViewModel(shopper: shopper)
     }
     
+    var body: some View {
+        Text(viewModel.shopper.name.full)
+    }
+    
+}
+
+
+#Preview {
+    let context = PersistenceController.preview.container.viewContext
+    let shopper = Shopper(context: context)
+    shopper.givenName = "Karl"
+    shopper.familyName = "Cridland"
+    
+    return ProfileView(shopper: shopper)
+        .environment(\.managedObjectContext, context)
 }
